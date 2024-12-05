@@ -1,0 +1,28 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"] // Alias @ points to src
+    },
+    "jsx": "react", // Ensures JSX is handled properly
+    "allowJs": true, // Allows JavaScript files alongside TypeScript
+    "resolveJsonModule": true, // Enables importing .json files
+    "esModuleInterop": true, // Enables ES6 module interop
+    "skipLibCheck": true, // Skips type-checking .d.ts files for faster builds
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src/**/*.{ts,tsx,js,jsx}", // Includes all .ts, .tsx, .js, and .jsx files in src
+    ".expo/types/**/*.ts", // Expo type definitions
+    "expo-env.d.ts", // Expo environment file
+    "nativewind-env.d.ts" // NativeWind environment file
+  ],
+  "exclude": [
+    "node_modules", // Exclude node_modules
+    "babel.config.js", // Exclude Babel config file
+    "metro.config.js" // Exclude Metro Bundler config file
+  ]
+}
+ 
