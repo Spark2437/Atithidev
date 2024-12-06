@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient 
 const OTPScreen = ({ route }) => {
   const [otp, setOtp] = useState(""); // OTP input state
   const [isLoading, setIsLoading] = useState(false); // Loading state for button
-  const { mobile } = route.params; // Get mobile from LoginScreen
+  const { mobile, name } = route.params; // Get mobile and name from LoginScreen
   const { saveUserId } = useUser(); // Access the saveUserId function from context
   const navigation = useNavigation(); // Navigation object
 
@@ -29,7 +29,7 @@ const OTPScreen = ({ route }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ Otp: otp, mobile }), // Send OTP and mobile number
+        body: JSON.stringify({ Otp: otp, mobile, Username: name }), // Send username here
       });
 
       const text = await response.text(); // Get raw response text

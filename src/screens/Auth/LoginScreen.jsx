@@ -1,47 +1,50 @@
 import React, { useState } from "react";
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator, Image } from "react-native";
+import { StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 const LoginScreen = ({ navigation }) => {
-  const [name, setName] = useState(""); // State for the user's name
-  const [mobile, setMobile] = useState(""); // State for mobile number
+  const [name, setName] = useState("");  // State for the user's name
+  const [mobile, setMobile] = useState("");  // State for mobile number
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
     console.log("Entered Name:", name);
     console.log("Entered Mobile Number:", mobile);
-
-    // Validate mobile number
+  
     if (!mobile || mobile.length !== 10 || isNaN(mobile)) {
       alert("Please enter a valid 10-digit mobile number.");
       return;
     }
-
+  
+    if (!name || name.trim().length === 0) {
+      alert("Please enter your name.");
+      return;
+    }
+  
     setIsLoading(true);
-
+  
     try {
       const response = await fetch("https://guest-event-app.onrender.com/api/send-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ mobile }), // Send mobile number for OTP
+        body: JSON.stringify({ name, mobile }), // Include name in the request
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error Response:", errorData);
         alert(`Error: ${errorData.reason || "Failed to send OTP"}`);
         return;
       }
-
+  
       const data = await response.json();
       console.log("API Response (Send OTP):", data);
-
+  
       if (data.status_code === 200) {
         alert("OTP sent successfully");
-        // Pass only mobile to the OTP screen
-        navigation.navigate("OTPScreen", { mobile });
+        navigation.navigate("OTPScreen", { name, mobile });
       } else {
         alert("Error in sending OTP. Please try again.");
       }
@@ -52,19 +55,19 @@ const LoginScreen = ({ navigation }) => {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
       style={styles.container}
     >
-
       <Text style={styles.heading}>Enter Your Mobile Number</Text>
       
-      {/* Name input (optional, not sent to OTP screen) */}
+      {/* Name input */}
       <TextInput
         style={styles.input}
-        placeholder="Your Name"
+        placeholder="Name"
         value={name}
         onChangeText={setName}
       />
@@ -107,12 +110,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
-  },
-  image: {
-    width: 100, // Adjust width as needed
-    height: 100, // Adjust height as needed
-    marginBottom: 20, // Space between image and heading
-    borderRadius: 50, // Optional, to make the image circular
   },
   input: {
     width: "100%",
