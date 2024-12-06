@@ -1,20 +1,20 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-
 import AllEvents from "../screens/Home/AllEvents";
+import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
 import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
 import ViewDetails from "../screens/ViewDetails/ViewDetails";
 import RSVP from "../screens/Home/RSVPScreen";
 import MediaScreen from "../screens/Media/MediaScreen";
-import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
+
 import HostFamily from "../screens/ViewDetails/FamilyDetails/HostFamily";
 import GroomFamilyDetails from "../screens/ViewDetails/FamilyDetails/GroomFamilyDetails";
 import BrideFamilyDetails from "../screens/ViewDetails/FamilyDetails/BrideFamilyDetails";
 import Gift from "../screens/ViewDetails/Gifts/Gift";
 import EventSchedule from "../screens/ViewDetails/EventDetails/EventSchedule";
+import Schedule from "../screens/ViewDetails/EventDetails/Schedule";
 import Travel from "../screens/ViewDetails/Travel/Travel";
 
-import Schedule from "../screens/ViewDetails/EventDetails/Schedule";
 import TravelDetails from "../screens/ViewDetails/Travel/TravelDetails";
 import SendHere from "../screens/ViewDetails/Gifts/SendHere";
 import Vendors from "../screens/ViewDetails/Vendors/Vendors";
@@ -38,7 +38,11 @@ const MainNavigator = () => (
         component={AllEvents}
         options={{ headerShown: false }}
       />
-
+ <Stack.Screen
+        name="SplashScreenEvents"
+        component={SplashScreenEvents}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="EventDetails"
         component={EventDetailsScreen}
@@ -137,11 +141,7 @@ const MainNavigator = () => (
         options={{ headerShown: false }}
       />
 
-      <Stack.Screen
-        name="SplashScreenEvents"
-        component={SplashScreenEvents}
-        options={{ headerShown: false }}
-      />
+     
     </Stack.Navigator>
 
 );

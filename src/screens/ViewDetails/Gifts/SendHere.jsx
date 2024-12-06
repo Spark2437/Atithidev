@@ -79,13 +79,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 20,
     backgroundColor: 'white', // Ensure white background for contrast
   },
   scrollContainer: {
     flexGrow: 1,
     width: '100%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
   flowerIconsContainer: {
@@ -104,13 +104,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
     marginTop: 60,
-    color: 'black', 
+    color: 'black',
   },
   textInputContainer: {
-    width: 300, // Adjust width to fit better
+    width: '90%', // Ensure it has some padding and is not too wide
     height: 150,
     position: 'relative',
     marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   largeTextBox: {
     width: '100%',
@@ -131,8 +133,8 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   buttonContainer: {
-    marginTop: 20,
     width: '100%',
+    marginTop: 20,
     paddingHorizontal: 10,
   },
 });

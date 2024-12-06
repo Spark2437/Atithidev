@@ -1,65 +1,111 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useState, useRef } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { useUser } from "../../contexts/UserContext"; // Import the useUser hook
+import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient for gradient background
 
-const OTPScreen = ({ route, navigation, setIsAuthenticated }) => {
-  const { mobile } = route.params;  
-  const [otp, setOtp] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+const OTPScreen = ({ route }) => {
+  const [otp, setOtp] = useState(""); // OTP input state
+  const [isLoading, setIsLoading] = useState(false); // Loading state for button
+  const { mobile } = route.params; // Get mobile from LoginScreen
+  const { saveUserId } = useUser(); // Access the saveUserId function from context
+  const navigation = useNavigation(); // Navigation object
 
-  const handleVerifyOTP = async () => {
-    if (!otp || otp.length !== 4 || isNaN(otp)) {
-      alert('Please enter a valid 4-digit OTP.');
+  // References for each OTP input
+  const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+
+  // Function to handle OTP verification
+  const verifyOTP = async () => {
+    if (!otp || otp.length !== 4) {
+      Alert.alert("Invalid OTP", "Please enter a valid 4-digit OTP.");
       return;
     }
 
-    setIsLoading(true);
+    setIsLoading(true); // Set loading state
 
     try {
-      const response = await fetch('https://guest-event-app.onrender.com/api/Verify-Otp', {
-        method: 'POST',
+      const response = await fetch("https://guest-event-app.onrender.com/api/Verify-Otp", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ mobile, otp }),
+        body: JSON.stringify({ Otp: otp, mobile }), // Send OTP and mobile number
       });
 
-      const data = await response.json();
-      console.log('API Response:', data);
+      const text = await response.text(); // Get raw response text
+      console.log("Raw Response: ", text); // Log raw response
 
-      if (data.status_code === 200) { 
-        alert('OTP verified successfully!'); 
-        setIsAuthenticated(true); // Set authentication state to true
-
-        // Navigate to All Events page after successful verification
-        navigation.navigate("AllEvents"); // Assuming AllEvents is part of MainNavigator
-      } else {
-        alert(data.message || 'Invalid OTP. Please try again.');
+      try {
+        const data = JSON.parse(text); // Manually parse the JSON
+        if (response.ok && data.status_code === 200) {
+          saveUserId(data.Profile.UserId); // Save UserId
+          Alert.alert("Success", "OTP verified successfully!");
+          navigation.reset({
+            index: 0,
+            routes: [{ name: "AllEvents" }], // Navigate to AllEvents screen
+          });
+        } else {
+          Alert.alert("Error", "OTP verification failed.");
+        }
+      } catch (e) {
+        console.error("Failed to parse JSON:", e);
+        Alert.alert("Error", "Response format is invalid.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred while verifying OTP. Please check your internet connection and try again.');
+      console.error("Error verifying OTP:", error);
+      Alert.alert("Error", "An error occurred while verifying OTP.");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Reset loading state
+    }
+  };
+
+  // Function to handle OTP input field change (for each digit)
+  const handleOtpChange = (text, index) => {
+    if (/^[0-9]{0,1}$/.test(text)) {
+      const updatedOtp = otp.split("");
+      updatedOtp[index] = text; // Update the specific digit in OTP
+      setOtp(updatedOtp.join(""));
+
+      // Move focus to next input if current field is filled
+      if (text && index < 3) {
+        inputRefs[index + 1].current.focus();
+      }
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>Enter OTP</Text>
-      <Text style={styles.subheading}>We sent a code to {mobile}</Text>
+    <LinearGradient
+      colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]} // Gradient colors
+      style={styles.container}
+    >
+      {/* Image Above Heading 
+      <Image 
+        source={require("../../../ass")} // Adjust the path to your image
+        style={styles.image}
+      />*/}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Enter OTP"
-        value={otp}
-        onChangeText={setOtp}
-        keyboardType="numeric" 
-        maxLength={4}         
-      />
+      <Text style={styles.heading}>Enter Verification Code</Text>
+      <Text style={styles.subHeading}>Sent to: {mobile}</Text>
 
+      <View style={styles.otpContainer}>
+        {/* OTP Input Fields */}
+        {[...Array(4)].map((_, index) => (
+          <TextInput
+            key={index}
+            ref={inputRefs[index]} // Assign ref to each TextInput
+            style={styles.otpBox}
+            value={otp[index] || ""}
+            onChangeText={(text) => handleOtpChange(text, index)} // Handle input change
+            keyboardType="numeric"
+            maxLength={1} // Restrict input to 1 digit
+          />
+        ))}
+      </View>
+
+      {/* Button */}
       <TouchableOpacity
         style={[styles.button, isLoading && styles.buttonDisabled]}
-        onPress={handleVerifyOTP}
+        onPress={verifyOTP}
         disabled={isLoading}
       >
         {isLoading ? (
@@ -68,52 +114,62 @@ const OTPScreen = ({ route, navigation, setIsAuthenticated }) => {
           <Text style={styles.buttonText}>Verify OTP</Text>
         )}
       </TouchableOpacity>
-    </View>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f2f2f2',
-    paddingHorizontal: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  image: {
+    width: 100, // Adjust the size of the image as needed
+    height: 100,
+    marginBottom: 20, // Space between the image and the heading
   },
   heading: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
-  subheading: {
+  subHeading: {
     fontSize: 16,
     marginBottom: 20,
-    textAlign: 'center',
-    color: '#666',
+    color: "#555",
   },
-  input: {
-    width: '100%',
-    padding: 15,
-    marginBottom: 20,
+  otpContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "80%",
+    marginBottom: 30,
+  },
+  otpBox: {
+    width: 50,
+    height: 50,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 5,
-    backgroundColor: '#fff',
+    fontSize: 24,
+    textAlign: "center",
+    backgroundColor: "#fff",
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: "#D08A76", // Matching the event button color
     padding: 15,
-    borderRadius: 5,
-    width: '100%',
-    alignItems: 'center',
+    borderRadius: 15,
+    width: "100%",
+    alignItems: "center",
   },
   buttonDisabled: {
-    backgroundColor: '#7da3d3',
+    backgroundColor: "#7da3d3", // Light disabled button color
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
     fontSize: 18,
   },
 });

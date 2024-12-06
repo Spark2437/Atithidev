@@ -27,10 +27,11 @@ const AllEvents = ({ navigation }) => {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleEventPress = (event) => {
-    // Pass the EventUUID to SplashScreenEvents
+  const handleEventPress = (event, userId) => {
+    // Pass the EventUUID and UserId to SplashScreenEvents
     navigation.navigate("SplashScreenEvents", {
       eventUUID: event.EventUUID,
+      UserId: userId,
     });
   };
 
@@ -42,6 +43,7 @@ const AllEvents = ({ navigation }) => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         
+
         <ScrollView contentContainerStyle={styles.eventList}>
           {loading ? (
             <Text style={styles.loadingText}>Loading events...</Text>
@@ -54,9 +56,9 @@ const AllEvents = ({ navigation }) => {
                 onPress={() => handleEventPress(event)}
               >
                 <View style={styles.eventCard}>
-                  {event.CoupleImage && (
+                  {event.EventImage && (
                     <Image
-                      source={{ uri: event.CoupleImage }} // Use CoupleImage
+                      source={{ uri: event.EventImage }}
                       style={styles.eventImage}
                     />
                   )}
@@ -67,6 +69,7 @@ const AllEvents = ({ navigation }) => {
                     </Text>
                     <Text style={styles.eventLocation}>{event.EventCity}</Text>
                     <Text style={styles.eventVenue}>Venue: {event.EventVenue}</Text>
+                    
                     <Text style={styles.eventDate}>
                       Starts: {new Date(event.EventStartDate).toLocaleString()}
                     </Text>
@@ -86,26 +89,16 @@ const AllEvents = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   gradientContainer: { flex: 1, flexDirection: "column", backgroundColor: "transparent" },
-  headerContainer: {
-    width: "100%",
-    padding: 6,
-    backgroundColor: "#D08A76",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 28,
-    fontFamily: "RobotoBold",
-    color: "#fff",
-  },
+
   eventList: {
     paddingBottom: 16,
   },
   eventCard: {
-    marginTop: 30, 
     flexDirection: "column",
     backgroundColor: "#fff",
     borderRadius: 10,
+    marginTop: 20,
+   
     overflow: "hidden",
     elevation: 4,
     marginLeft: 10,
