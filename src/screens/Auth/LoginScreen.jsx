@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React, { useState } from "react";  
 import { StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
 
-const LoginScreen = ({ navigation }) => {
-  const [name, setName] = useState("");  // State for the user's name
-  const [mobile, setMobile] = useState("");  // State for mobile number
+const LoginScreen = () => {
+  const [name, setName] = useState("");  
+  const [mobile, setMobile] = useState("");  
   const [isLoading, setIsLoading] = useState(false);
+
+  const navigation = useNavigation();
 
   const handleLogin = async () => {
     console.log("Entered Name:", name);
     console.log("Entered Mobile Number:", mobile);
   
+    // Validation checks
     if (!mobile || mobile.length !== 10 || isNaN(mobile)) {
       alert("Please enter a valid 10-digit mobile number.");
       return;
@@ -29,7 +33,7 @@ const LoginScreen = ({ navigation }) => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, mobile }), // Include name in the request
+        body: JSON.stringify({ name, mobile }),  
       });
   
       if (!response.ok) {
@@ -44,7 +48,9 @@ const LoginScreen = ({ navigation }) => {
   
       if (data.status_code === 200) {
         alert("OTP sent successfully");
-        navigation.navigate("OTPScreen", { name, mobile });
+
+        // Navigate to OTP screen, passing name, mobile
+        navigation.navigate("OTPScreen", { name, mobile });  
       } else {
         alert("Error in sending OTP. Please try again.");
       }
@@ -55,11 +61,10 @@ const LoginScreen = ({ navigation }) => {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <LinearGradient
-      colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
+      colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]} 
       style={styles.container}
     >
       <Text style={styles.heading}>Enter Your Mobile Number</Text>

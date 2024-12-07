@@ -1,24 +1,24 @@
-import React, { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext } from "react";
 
+// Create context
 const UserContext = createContext();
 
+// Define provider
 export const UserProvider = ({ children }) => {
   const [userId, setUserId] = useState(null);
-  
-  // Save the userId
-  const saveUserId = (id) => {
-    setUserId(id);
+
+  const checkUserStatus = async () => {
+    const storedUserId = await AsyncStorage.getItem('userId');
+    if (storedUserId) {
+      setUserId(storedUserId);
+    }
   };
 
-
   return (
-    <UserContext.Provider value={{ userId,  saveUserId }}>
+    <UserContext.Provider value={{ userId, setUserId, checkUserStatus }}>
       {children}
     </UserContext.Provider>
   );
 };
 
-// Custom hook to use user context
-export const useUser = () => {
-  return useContext(UserContext);
-};
+export const useUserContext = () => useContext(UserContext);

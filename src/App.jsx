@@ -1,25 +1,48 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { UserProvider } from "./contexts/UserContext";  // Import UserProvider
-import AuthNavigator from "./Navigator/AuthNavigator"; // Import AuthNavigator
-import MainNavigator from "./Navigator/MainNavigator"; // Import MainNavigator
+import { UserProvider, useUserContext } from "./contexts/UserContext"; // Import UserContext
+import AuthNavigator from "./Navigator/AuthNavigator";
+import MainNavigator from "./Navigator/MainNavigator";
+import { AsyncStorage } from "react-native";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); // Start with not authenticated
+  const { userId, setUserId } = useUserContext(); // Fetch userId from context
+  const [isChecked, setIsChecked] = useState(false); // To track if user is logged in
+
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem("userId"); 
+        if (storedUserId) {
+          setUserId(storedUserId); // Set userId in context
+        }
+      } catch (error) {
+        console.error("Error fetching userId from AsyncStorage", error);
+      } finally {
+        setIsChecked(true); // Mark check as complete
+      }
+    };
+
+    checkUserStatus(); // Run checkUserStatus when app starts
+  }, [setUserId]);
+
+  // Wait until user status is checked before rendering anything
+  if (!isChecked) {
+    return null; // You can add a loading screen here
+  }
 
   return (
-    // Wrap everything with UserProvider to make sure context is accessible
-    <UserProvider>
-      <NavigationContainer>
-        {/* Render either AuthNavigator or MainNavigator based on authentication status */}
-        {isAuthenticated ? (
-          <MainNavigator /> // User is authenticated, show main app
-        ) : (
-          <AuthNavigator setIsAuthenticated={setIsAuthenticated} /> // Pass setIsAuthenticated to AuthNavigator
-        )}
-      </NavigationContainer>
-    </UserProvider>
+    <NavigationContainer>
+      {userId ? <MainNavigator /> : <AuthNavigator />}  {/* Conditional navigation */}
+    </NavigationContainer>
   );
 };
 
-export default App;
+// Wrap App with UserProvider to ensure context is available throughout
+const AppWithProvider = () => (
+  <UserProvider>
+    <App />
+  </UserProvider>
+);
+
+export default AppWithProvider;

@@ -34,11 +34,11 @@ const EventDetails = ({ route, navigation }) => {
       .then((data) => {
         if (data.status_code === 200 && data.Data.length > 0) {
           setEventDetails(data.Data[0]);
-          
+
           // Fetching userId from the API response
           const fetchedUserId = data.Data[0]?.UserId; // Assuming the API provides userId
           console.log("Fetched UserId:", fetchedUserId);
-          
+
           // Storing userId in state
           setUserId(fetchedUserId);
         } else {
@@ -51,10 +51,6 @@ const EventDetails = ({ route, navigation }) => {
 
   if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
   if (error) return <Text style={styles.errorText}>{error}</Text>;
-
-  const handleCameraPress = () => {
-    setMenuVisible(!menuVisible);
-  };
 
   const openCamera = async () => {
     setMenuVisible(false);
@@ -117,97 +113,106 @@ const EventDetails = ({ route, navigation }) => {
       style={styles.gradientContainer}
     >
       <SafeAreaView style={styles.safeArea}>
-        <ScrollView contentContainerStyle={styles.container}>
-          {eventDetails?.CoupleImage && (
-            <View style={styles.imageWrapper}>
-              <Image
-                source={{ uri: eventDetails.CoupleImage }}
-                style={styles.eventImage}
-              />
-              <TouchableOpacity style={styles.cameraIcon} onPress={handleCameraPress}>
-                <Icon name="camera-outline" size={30} color="#FFF" />
-              </TouchableOpacity>
-              {menuVisible && (
-                <View style={styles.menu}>
-                  <TouchableOpacity style={styles.menuOption} onPress={openCamera}>
-                    <Text style={styles.menuText}>Camera</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.menuOption} onPress={openMediaScreen}>
-                    <Text style={styles.menuText}>Media</Text>
-                  </TouchableOpacity>
-                </View>
-              )}
-            </View>
-          )}
+        <View style={styles.mainContainer}>
+          <ScrollView contentContainerStyle={styles.container}>
+            {eventDetails?.CoupleImage && (
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={{ uri: eventDetails.CoupleImage }}
+                  style={styles.eventImage}
+                />
+              </View>
+            )}
 
-          <Text style={styles.eventName}>{eventDetails?.CoupleName}</Text>
+            <Text style={styles.eventName}>{eventDetails?.CoupleName}</Text>
 
-          {/* Event details */}
-          <Text style={styles.eventDetails}>
-            <Text style={styles.boldText}>Location:</Text> {eventDetails?.EventCity}
-          </Text>
-          <Text style={styles.eventDetails}>
-            <Text style={styles.boldText}>Venue:</Text> {eventDetails?.EventVenue}
-          </Text>
-          <Text style={styles.eventDetails}>
-            <Text style={styles.boldText}>Start Date:</Text>{" "}
-            {new Date(eventDetails?.EventStartDate).toLocaleDateString()}
-          </Text>
-          <Text style={styles.eventDetails}>
-            <Text style={styles.boldText}>End Date:</Text>{" "}
-            {new Date(eventDetails?.EventEndDate).toLocaleDateString()}
-          </Text>
-          <Text style={styles.eventDetails}>
-            <Text style={styles.boldText}>Organizer:</Text>{" "}
-            {eventDetails?.EventOrganizer}
-          </Text>
+            {/* Event details */}
+            <Text style={styles.eventDetails}>
+              <Text style={styles.boldText}>Location:</Text> {eventDetails?.EventCity}
+            </Text>
+            <Text style={styles.eventDetails}>
+              <Text style={styles.boldText}>Venue:</Text> {eventDetails?.EventVenue}
+            </Text>
+            <Text style={styles.eventDetails}>
+              <Text style={styles.boldText}>Start Date:</Text>{" "}
+              {new Date(eventDetails?.EventStartDate).toLocaleDateString()}
+            </Text>
+            <Text style={styles.eventDetails}>
+              <Text style={styles.boldText}>End Date:</Text>{" "}
+              {new Date(eventDetails?.EventEndDate).toLocaleDateString()}
+            </Text>
+            <Text style={styles.eventDetails}>
+              <Text style={styles.boldText}>Organizer:</Text>{" "}
+              {eventDetails?.EventOrganizer}
+            </Text>
 
-          <TouchableOpacity
-            style={styles.rsvpButton}
-            onPress={() =>
-              navigation.navigate("RSVPScreen", {
-                eventUUID: eventDetails?.EventUUID,
-              })
-            }
-          >
-            <Text style={styles.buttonText}>RSVP</Text>
-          </TouchableOpacity>
-
-          <Text style={styles.eventDescription}>{eventDetails?.EventDetails}</Text>
-
-          <View style={styles.buttonContainer}>
             <TouchableOpacity
-              style={styles.ViewDetails}
+              style={styles.rsvpButton}
               onPress={() =>
-                navigation.navigate("ViewDetails", {
+                navigation.navigate("RSVPScreen", {
                   eventUUID: eventDetails?.EventUUID,
                 })
               }
             >
-              <Text style={styles.buttonText}>View Details</Text>
+              <Text style={styles.buttonText}>RSVP</Text>
             </TouchableOpacity>
 
+            <Text style={styles.eventDescription}>{eventDetails?.EventDetails}</Text>
+
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.ViewDetails}
+                onPress={() =>
+                  navigation.navigate("ViewDetails", {
+                    eventUUID: eventDetails?.EventUUID,
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>View Details</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.ViewDetails}
+                onPress={() =>
+                  navigation.navigate("NextEvent", {
+                    eventUUID: eventDetails?.EventUUID,
+                  })
+                }
+              >
+                <Text style={styles.buttonText}>Event Starts Here</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate("Home")}>
+              <Icon name="home-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
+              <Icon name="camera-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.footerButton} onPress={openMediaScreen}>
+              <Icon name="images-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
             <TouchableOpacity
-              style={styles.ViewDetails}
-              onPress={() =>
-                navigation.navigate("NextEvent", {
-                  eventUUID: eventDetails?.EventUUID,
-                })
-              }
+              style={styles.footerButton}
+              onPress={() => navigation.navigate("Vendors", { eventUUID })} // Pass eventUUID to Vendors screen
             >
-              <Text style={styles.buttonText}>Event Starts Here</Text>
+              <Icon name="business-outline" size={24} color="#FFF" />
             </TouchableOpacity>
           </View>
-        </ScrollView>
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  gradientContainer: { flex: 1, flexDirection: "column", backgroundColor: "transparent" },
+  gradientContainer: { flex: 1, backgroundColor: "transparent" },
   safeArea: { flex: 1 },
-  container: { padding: 16, flexGrow: 1 },
+  mainContainer: { flex: 1, flexDirection: "column" },
+  container: { padding: 16, paddingBottom: 100 }, // Added padding to make room for footer
   loadingText: { textAlign: "center", marginTop: 20 },
   errorText: { textAlign: "center", color: "red" },
   imageWrapper: {
@@ -218,34 +223,6 @@ const styles = StyleSheet.create({
   eventImage: {
     width: "100%",
     height: "100%",
-  },
-  cameraIcon: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    padding: 5,
-    borderRadius: 15,
-  },
-  menu: {
-    position: "absolute",
-    top: 50,
-    right: 10,
-    backgroundColor: "#FFF",
-    borderRadius: 8,
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  menuOption: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#DDD",
-  },
-  menuText: {
-    fontSize: 16,
   },
   eventName: {
     fontSize: 24,
@@ -275,6 +252,20 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: "#D08A76",
     borderRadius: 10,
+    alignItems: "center",
+  },
+  // Footer 
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#D08A76",
+    paddingVertical: 10,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  footerButton: {
     alignItems: "center",
   },
 });
