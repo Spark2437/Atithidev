@@ -3,10 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 const RSVP = ({ route, navigation }) => {
-  const { eventUUID } = route.params; // Get eventUUID from navigation params
-  const [userId, setUserId] = useState(null); // State for storing UserId
-  const [response, setResponse] = useState(null); // State for RSVP response
-  console.log("Event UUID:", eventUUID);  // Log eventUUID
+  const { eventUUID } = route.params; 
+  const [userId, setUserId] = useState(null); 
+  const [response, setResponse] = useState(null); 
+  console.log("Event UUID:", eventUUID);  
 
   // Fetch Event Details and Extract UserId
   useEffect(() => {
@@ -20,8 +20,8 @@ const RSVP = ({ route, navigation }) => {
       .then((res) => res.json())
       .then((data) => {
         if (data.status_code === 200 && data.Data?.length > 0) {
-          setUserId(data.Data[0].UserId); // Extract UserId from the first item in Data array
-          console.log("Fetched UserId:", data.Data[0].UserId); // Log UserId after fetching
+          setUserId(data.Data[0].UserId); 
+          console.log("Fetched UserId:", data.Data[0].UserId); 
         } else {
           Alert.alert("Error", "Unable to fetch User ID.");
         }

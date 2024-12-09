@@ -6,7 +6,6 @@ import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
 import ViewDetails from "../screens/ViewDetails/ViewDetails";
 import RSVP from "../screens/Home/RSVPScreen";
 import MediaScreen from "../screens/Media/MediaScreen";
-
 import CategoryImages from "../screens/Media/CategoryImages";
 import HostFamily from "../screens/ViewDetails/FamilyDetails/HostFamily";
 import GroomFamilyDetails from "../screens/ViewDetails/FamilyDetails/GroomFamilyDetails";
@@ -33,21 +32,21 @@ const MainNavigator = () => (
       headerTitleStyle: { fontWeight: "bold" },
     }}
   >
-       <Stack.Screen
-  name="AllEvents"
-  component={AllEvents}
-  options={{ headerShown: false }}
-/>
+    <Stack.Screen
+      name="AllEvents"
+      component={AllEvents}
+      options={{ headerShown: false }}
+    />
     <Stack.Screen
       name="SplashScreenEvents"
       component={SplashScreenEvents}
       options={{ headerShown: false }}
     />
     <Stack.Screen
-  name="EventDetails"
-  component={EventDetailsScreen}
-   options={{ headerShown: false }}
-/>
+      name="EventDetails"
+      component={EventDetailsScreen}
+      options={{ headerShown: false }}
+    />
 
     <Stack.Screen
       name="ViewDetails"
@@ -66,9 +65,9 @@ const MainNavigator = () => (
       component={MediaScreen}
       options={{ headerShown: false }}
     />
-  
 
-<Stack.Screen
+
+    <Stack.Screen
       name="CategoryImages"
       component={CategoryImages}
       options={{ headerShown: false }}
@@ -76,7 +75,7 @@ const MainNavigator = () => (
 
     <Stack.Screen
       name="NextEvent"
-      component={NextEvent}  
+      component={NextEvent}
       options={{ headerShown: false }}
     />
 
@@ -140,13 +139,11 @@ const MainNavigator = () => (
       options={{ headerShown: false }}
     />
 
-
     <Stack.Screen
       name="VendorDetails"
-      component={VendorDetails} 
+      component={VendorDetails}
       options={{ headerShown: false }}
     />
-
 
   </Stack.Navigator>
 

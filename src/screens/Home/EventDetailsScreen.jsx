@@ -124,7 +124,7 @@ const EventDetails = ({ route, navigation }) => {
             console.log("Upload response:", data);
             if (data.status_code === 200) {
               Alert.alert("Success", "Image uploaded successfully!");
-              console.log("Uploaded Data:", data.Data); // Log uploaded data for verification
+              console.log("Uploaded Data:", data.Data); 
             } else {
               Alert.alert("Error", data.message || "Failed to upload image.");
               console.error("Upload error:", data.message);
@@ -151,10 +151,10 @@ const EventDetails = ({ route, navigation }) => {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.mainContainer}>
           <ScrollView contentContainerStyle={styles.container}>
-            {eventDetails?.CoupleImage && (
+            {eventDetails?.EventImage && (
               <View style={styles.imageWrapper}>
                 <Image
-                  source={{ uri: eventDetails.CoupleImage }}
+                  source={{ uri: eventDetails.EventImage}}
                   style={styles.eventImage}
                 />
               </View>
@@ -221,9 +221,7 @@ const EventDetails = ({ route, navigation }) => {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <TouchableOpacity style={styles.footerButton} onPress={() => navigation.navigate("Home")}>
-              <Icon name="home-outline" size={24} color="#FFF" />
-            </TouchableOpacity>
+          
             <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
               <Icon name="camera-outline" size={24} color="#FFF" />
             </TouchableOpacity>
