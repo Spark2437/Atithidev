@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
 
 const SplashScreenEvents = ({ route, navigation }) => {
-  const { eventUUID, UserId } = route.params;
+  const { eventUUID } = route.params;
   const [splashData, setSplashData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,11 +29,11 @@ const SplashScreenEvents = ({ route, navigation }) => {
       .finally(() => setLoading(false));
 
     const timer = setTimeout(() => {
-      navigation.replace("EventDetails", { eventUUID, UserId });
+      navigation.replace("EventDetails", { eventUUID });
     }, 3000); // Navigate to EventDetails after 3 seconds
 
     return () => clearTimeout(timer);
-  }, [eventUUID, UserId, navigation]);
+  }, [eventUUID,navigation]);
 
   if (loading) {
     return <Text style={styles.loadingText}>Loading splash screen...</Text>;

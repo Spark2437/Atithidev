@@ -6,6 +6,8 @@ import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
 import ViewDetails from "../screens/ViewDetails/ViewDetails";
 import RSVP from "../screens/Home/RSVPScreen";
 import MediaScreen from "../screens/Media/MediaScreen";
+
+import CategoryImages from "../screens/Media/CategoryImages";
 import HostFamily from "../screens/ViewDetails/FamilyDetails/HostFamily";
 import GroomFamilyDetails from "../screens/ViewDetails/FamilyDetails/GroomFamilyDetails";
 import BrideFamilyDetails from "../screens/ViewDetails/FamilyDetails/BrideFamilyDetails";
@@ -23,124 +25,130 @@ const Stack = createStackNavigator();
 
 const MainNavigator = () => (
 
-    <Stack.Navigator
-      initialRouteName="AllEvents"
-      screenOptions={{
-        headerStyle: { backgroundColor: "#d8b4a0" },
-        headerTintColor: "#000",
-        headerTitleStyle: { fontWeight: "bold" },
-      }}
-    >
-      <Stack.Screen
-        name="AllEvents"
-        component={AllEvents}
-        options={{ headerShown: false }}
-      />
- <Stack.Screen
-        name="SplashScreenEvents"
-        component={SplashScreenEvents}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="EventDetails"
-        component={EventDetailsScreen}
-        options={{ headerShown: false }}
-      />
+  <Stack.Navigator
+    initialRouteName="AllEvents"
+    screenOptions={{
+      headerStyle: { backgroundColor: "#d8b4a0" },
+      headerTintColor: "#000",
+      headerTitleStyle: { fontWeight: "bold" },
+    }}
+  >
+       <Stack.Screen
+  name="AllEvents"
+  component={AllEvents}
+  options={{ headerShown: false }}
+/>
+    <Stack.Screen
+      name="SplashScreenEvents"
+      component={SplashScreenEvents}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+  name="EventDetails"
+  component={EventDetailsScreen}
+   options={{ headerShown: false }}
+/>
 
-      <Stack.Screen
-        name="ViewDetails"
-        component={ViewDetails}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="ViewDetails"
+      component={ViewDetails}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="RSVPScreen"
-        component={RSVP}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="RSVPScreen"
+      component={RSVP}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="MediaScreen"
-        component={MediaScreen}
-        options={{ headerShown: false }}
-      />
-
-   
-      <Stack.Screen
-        name="NextEvent"
-        component={NextEvent}
-        options={{ headerShown: false }}
-      />
-
-      <Stack.Screen
-        name="HostFamily"
-        component={HostFamily}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="MediaScreen"
+      component={MediaScreen}
+      options={{ headerShown: false }}
+    />
+  
 
 <Stack.Screen
-        name="BrideFamilyDetails"
-        component={BrideFamilyDetails}
-        options={{ headerShown: false }}
-      />
+      name="CategoryImages"
+      component={CategoryImages}
+      options={{ headerShown: false }}
+    />
 
-<Stack.Screen
-        name="GroomFamilyDetails"
-        component={GroomFamilyDetails}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="NextEvent"
+      component={NextEvent}  
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="EventSchedule"
-        component={EventSchedule}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="HostFamily"
+      component={HostFamily}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="Schedule"
-        component={Schedule}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="BrideFamilyDetails"
+      component={BrideFamilyDetails}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="Travel"
-        component={Travel}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="GroomFamilyDetails"
+      component={GroomFamilyDetails}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="TravelDetails"
-        component={TravelDetails}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="EventSchedule"
+      component={EventSchedule}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="Gift"
-        component={Gift}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="Schedule"
+      component={Schedule}
+      options={{ headerShown: false }}
+    />
 
-      <Stack.Screen
-        name="SendHere"
-        component={SendHere}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="Travel"
+      component={Travel}
+      options={{ headerShown: false }}
+    />
 
-<Stack.Screen
-        name="Vendors"
-        component={Vendors}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="TravelDetails"
+      component={TravelDetails}
+      options={{ headerShown: false }}
+    />
+
+    <Stack.Screen
+      name="Gift"
+      component={Gift}
+      options={{ headerShown: false }}
+    />
+
+    <Stack.Screen
+      name="SendHere"
+      component={SendHere}
+      options={{ headerShown: false }}
+    />
+
+    <Stack.Screen
+      name="Vendors"
+      component={Vendors}
+      options={{ headerShown: false }}
+    />
 
 
-<Stack.Screen
-        name="VendorDetails"
-        component={VendorDetails}
-        options={{ headerShown: false }}
-      />
+    <Stack.Screen
+      name="VendorDetails"
+      component={VendorDetails} 
+      options={{ headerShown: false }}
+    />
 
-     
-    </Stack.Navigator>
+
+  </Stack.Navigator>
 
 );
 

@@ -1,48 +1,47 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { UserProvider, useUserContext } from "./contexts/UserContext"; // Import UserContext
+// import { UserProvider, useUserContext } from "./contexts/UserContext";  // Commented out UserContext logic
 import AuthNavigator from "./Navigator/AuthNavigator";
 import MainNavigator from "./Navigator/MainNavigator";
-import { AsyncStorage } from "react-native";
+// import AsyncStorage from "@react-native-async-storage/async-storage"; // Commented out AsyncStorage logic
 
 const App = () => {
-  const { userId, setUserId } = useUserContext(); // Fetch userId from context
-  const [isChecked, setIsChecked] = useState(false); // To track if user is logged in
+  // const { UserID, setUserID } = useUserContext(); // Commented out UserID and state logic
+  // const [isChecked, setIsChecked] = useState(false); // Commented out state logic
 
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      try {
-        const storedUserId = await AsyncStorage.getItem("userId"); 
-        if (storedUserId) {
-          setUserId(storedUserId); // Set userId in context
-        }
-      } catch (error) {
-        console.error("Error fetching userId from AsyncStorage", error);
-      } finally {
-        setIsChecked(true); // Mark check as complete
-      }
-    };
+  // useEffect(() => {
+  //   const checkUserStatus = async () => {
+  //     try {
+  //       const storedUserID = await AsyncStorage.getItem("UserID"); // Commented out AsyncStorage logic
+  //       if (storedUserID) {
+  //         setUserID(storedUserID); // Commented out UserID setting logic
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching UserID from AsyncStorage", error);
+  //     } finally {
+  //       setIsChecked(true); // Commented out state update logic
+  //     }
+  //   };
 
-    checkUserStatus(); // Run checkUserStatus when app starts
-  }, [setUserId]);
+  //   checkUserStatus();
+  // }, [setUserID]);
 
-  // Wait until user status is checked before rendering anything
-  if (!isChecked) {
-    return null; // You can add a loading screen here
-  }
+  // if (!isChecked) {
+  //   return null; // Commented out logic for loading state
+  // }
 
   return (
     <NavigationContainer>
-      {userId ? <MainNavigator /> : <AuthNavigator />}  {/* Conditional navigation */}
+      {/* Always start from AuthNavigator */}
+      <AuthNavigator />
     </NavigationContainer>
   );
 };
 
-// Wrap App with UserProvider to ensure context is available throughout
-const AppWithProvider = () => (
-  <UserProvider>
-    <App />
-  </UserProvider>
-);
+// const AppWithProvider = () => (
+//   <UserProvider>
+//     <App />
+//   </UserProvider>
+// ); // Commented out UserProvider logic
 
-export default AppWithProvider;
+export default App;

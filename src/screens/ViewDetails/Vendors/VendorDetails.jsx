@@ -82,11 +82,11 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   image: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 8,
-  },
+    width: '100%', 
+    height: 400,   
+    resizeMode: 'contain', 
+},
+
   title: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -97,6 +97,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
     marginBottom: 10,
+    marginTop:10, 
   },
   location: {
     fontSize: 14,

@@ -1,34 +1,30 @@
-// Navigator/AuthNavigator.js
-import React, { useState } from "react";
+import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../screens/Auth/LoginScreen";
-import OTPScreen from "../screens/Auth/OTPScreen"; 
-import { useUserContext } from "../contexts/UserContext";
+import OTPScreen from "../screens/Auth/OTPScreen";
+import MainNavigator from "./MainNavigator"; 
 
 const Stack = createStackNavigator();
 
 const AuthNavigator = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false); 
-  const { setUserId } = useUserContext(); 
   return (
     <Stack.Navigator initialRouteName="LoginScreen">
-      <Stack.Screen 
-        name="LoginScreen" 
-        component={LoginScreen} 
-        options={{ headerShown: false }} 
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="OTPScreen"
-        component={(props) => (
-          <OTPScreen 
-            {...props} 
-            setIsAuthenticated={setIsAuthenticated} 
-            setUserId={setUserId}  
-          />
-        )}
+        component={OTPScreen}
         options={{ headerShown: false }}
       />
-
+      
+      <Stack.Screen 
+        name="Main" 
+        component={MainNavigator} 
+        options={{ headerShown: false }} 
+      />
     </Stack.Navigator>
   );
 };

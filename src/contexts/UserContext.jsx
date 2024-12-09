@@ -1,21 +1,26 @@
-import { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { AsyncStorage } from "react-native"; // Ensure AsyncStorage is imported
 
 // Create context
 const UserContext = createContext();
 
 // Define provider
 export const UserProvider = ({ children }) => {
-  const [userId, setUserId] = useState(null);
+  const [UserID, setUserID] = useState(null);
 
   const checkUserStatus = async () => {
-    const storedUserId = await AsyncStorage.getItem('userId');
-    if (storedUserId) {
-      setUserId(storedUserId);
+    const storedUserID = await AsyncStorage.getItem('UserID');
+    if (storedUserID) {
+      setUserID(storedUserID);  // This will set the UserID in the context
     }
   };
 
+  useEffect(() => {
+    checkUserStatus();  // Automatically check user status on initial render
+  }, []);
+
   return (
-    <UserContext.Provider value={{ userId, setUserId, checkUserStatus }}>
+    <UserContext.Provider value={{ UserID, setUserID, checkUserStatus }}>
       {children}
     </UserContext.Provider>
   );

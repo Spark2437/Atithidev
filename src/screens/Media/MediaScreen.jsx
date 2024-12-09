@@ -5,70 +5,51 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  SafeAreaView,
   TouchableOpacity,
-  Alert,
+  Modal,
+  Dimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import Icon from "react-native-vector-icons/Ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import * as ImagePicker from "expo-image-picker";
-import { useUser } from "../../contexts/UserContext"; 
+
+const { width, height } = Dimensions.get("window");
 
 const MediaScreen = ({ route, navigation }) => {
-  const { eventUUID } = route.params; // Getting eventUUID from route params
-  const { userId } = useUser(); // Get userId from context
+  const { eventUUID, userId } = route.params;
 
-  const [imageData, setImageData] = useState([]); // State to store image categories
+  const [imageData, setImageData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     console.log("Event UUID:", eventUUID);
-    console.log("User ID:", userId); // userId from context
-  
+    console.log("User ID:", userId);
     console.log("Fetching media data...");
-    // Fetching media data (images grouped by category) based on eventUUID and userId
+
+    // Fetching media data
     fetch("https://guest-event-app.onrender.com/api/ImageGalleryList", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ EventUUID: eventUUID, UserID: [userId] }), // Sending userId as an array
+      body: JSON.stringify({ EventUUID: eventUUID, UserId: userId }),
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched data:", data); // Log the fetched data
+        console.log("Fetched data:", data);
         if (data.status_code === 200 && data.data.length > 0) {
-          setImageData(data.data); // Assuming data.data contains categories of images
-          setLoading(false);
+          setImageData(data.data);
         } else {
           setError(data.Remark || "No media found for this event.");
-          setLoading(false);
         }
+        setLoading(false);
       })
       .catch((err) => {
-        console.log("Error fetching media:", err); // Log any errors
+        console.log("Error fetching media:", err);
         setError("Failed to load media.");
         setLoading(false);
       });
-  }, [eventUUID, userId]); // Dependency array to trigger effect when eventUUID or userId changes
-  
-  // Function to handle image picking
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      console.log("Image picked:", result.uri); // Log the selected image URI
-      Alert.alert("Image picked", `You selected: ${result.uri}`);
-    } else {
-      console.log("Image picking canceled"); // Log if the image picking was canceled
-    }
-  };
+  }, [eventUUID, userId]);
 
   if (loading) {
     return (
@@ -89,41 +70,61 @@ const MediaScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
-        <LinearGradient
-          colors={["#00c6ff", "#0072ff"]}
-          style={styles.gradient}
-        >
-          <Text style={styles.heading}>Media</Text>
-        </LinearGradient>
-
-        <Text style={styles.userInfo}>User ID: {userId}</Text> {/* Displaying the userID from context */}
-
-        <TouchableOpacity
-          style={styles.pickImageButton}
-          onPress={pickImage}
-        >
-          <Icon name="camera" size={30} color="#fff" />
-          <Text style={styles.pickImageText}>Pick an image</Text>
-        </TouchableOpacity>
-
         {imageData.map((category, index) => (
           <View key={index} style={styles.categoryContainer}>
-            <Text style={styles.categoryHeading}>{category.Category}</Text> {/* Display the category name */}
+            <View style={styles.categoryHeader}>
+              <Text style={styles.categoryHeading}>{category.Category}</Text>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("CategoryImages", {
+                    category: category.Category,
+                    images: category.Image,
+                  })
+                }
+              >
+                <Text style={styles.seeAllText}>See All</Text>
+              </TouchableOpacity>
+            </View>
 
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {category.Image.map((image, index) => (
-                <View key={index} style={styles.imageContainer}>
-                  <Image
-                    source={{ uri: image.Image }} // Using the image URL from the data
-                    style={styles.image}
-                    resizeMode="cover"
-                  />
+            <View style={styles.gridContainer}>
+              {category.Image.slice(0, 6).map((imageItem, imgIndex) => (
+                <View key={imgIndex} style={styles.imageContainer}>
+                  <TouchableOpacity
+                    onPress={() => setSelectedImage(imageItem.Image)}
+                  >
+                    <Image
+                      source={{ uri: imageItem.Image }}
+                      style={styles.image}
+                      resizeMode="cover"
+                    />
+                  </TouchableOpacity>
                 </View>
               ))}
-            </ScrollView>
+            </View>
           </View>
         ))}
       </ScrollView>
+
+      {/* Full-Screen Image Modal */}
+      {selectedImage && (
+        <Modal
+          visible={!!selectedImage}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setSelectedImage(null)}
+        >
+          <TouchableOpacity
+            style={styles.fullScreenContainer}
+            onPress={() => setSelectedImage(null)}
+          >
+            <Image
+              source={{ uri: selectedImage }}
+              style={styles.fullScreenImage}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 };
@@ -132,56 +133,54 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f4f4f4",
+    marginTop: 30,
   },
   scrollView: {
-    padding: 10,
-  },
-  gradient: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 20,
-    marginBottom: 10,
-  },
-  heading: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  userInfo: {
-    fontSize: 16,
-    color: "#333",
-    marginVertical: 10,
-    textAlign: "center",
-  },
-  pickImageButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#0072ff",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-  },
-  pickImageText: {
-    marginLeft: 10,
-    color: "#fff",
-    fontSize: 16,
+    padding: 20,
   },
   categoryContainer: {
     marginBottom: 20,
   },
+  categoryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
   categoryHeading: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 10,
+  },
+  seeAllText: {
+    fontSize: 16,
+    color: "black",
+    fontWeight: "500",
+  },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginTop: 10,
   },
   imageContainer: {
-    marginRight: 10,
+    width: "30%",
+    marginBottom: 10,
   },
   image: {
-    width: 150,
-    height: 150,
+    width: "100%",
+    aspectRatio: 1,
     borderRadius: 8,
+  },
+
+  // Full-Screen Image Modal Styles
+  fullScreenContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  fullScreenImage: {
+    width: width,
+    height: height,
+    backgroundColor: "black",
   },
 });
 

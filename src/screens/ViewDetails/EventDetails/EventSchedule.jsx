@@ -56,9 +56,7 @@ const EventSchedule = ({ route }) => {
       style={styles.gradientContainer}
     >
       <SafeAreaView style={{ flex: 1 }}>
-        <View style={styles.headerContainer}>
-          <Text style={styles.headerText}>Event Schedule</Text>
-        </View>
+      
 
         <ScrollView contentContainerStyle={styles.scheduleList}>
           {loading ? (

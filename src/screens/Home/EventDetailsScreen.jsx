@@ -14,15 +14,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 
 const EventDetails = ({ route, navigation }) => {
-  const { eventUUID } = route.params; // Getting eventUUID from route params, userId will be fetched from the API
+  const { eventUUID } = route.params;
 
   const [eventDetails, setEventDetails] = useState(null);
-  const [userId, setUserId] = useState(null); // State to store the userId fetched from the API
+  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
+    console.log("Fetching event details for EventUUID:", eventUUID);
     fetch("https://guest-event-app.onrender.com/api/eventdetailsbyuuid", {
       method: "POST",
       headers: {
@@ -32,20 +32,21 @@ const EventDetails = ({ route, navigation }) => {
     })
       .then((response) => response.json())
       .then((data) => {
+        console.log("Received data:", data);
         if (data.status_code === 200 && data.Data.length > 0) {
           setEventDetails(data.Data[0]);
-
-          // Fetching userId from the API response
-          const fetchedUserId = data.Data[0]?.UserId; // Assuming the API provides userId
+          const fetchedUserId = data.Data[0]?.UserId;
           console.log("Fetched UserId:", fetchedUserId);
-
-          // Storing userId in state
           setUserId(fetchedUserId);
         } else {
           setError("Failed to fetch event details.");
+          console.error("Error fetching event details:", data.Remark);
         }
       })
-      .catch((err) => setError("Error fetching event details: " + err.message))
+      .catch((err) => {
+        setError("Error fetching event details: " + err.message);
+        console.error("Fetch error:", err);
+      })
       .finally(() => setLoading(false));
   }, [eventUUID]);
 
@@ -53,58 +54,93 @@ const EventDetails = ({ route, navigation }) => {
   if (error) return <Text style={styles.errorText}>{error}</Text>;
 
   const openCamera = async () => {
-    setMenuVisible(false);
+    try {
+      // Request camera permissions
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Camera permission is required to use this feature.");
+        return;
+      }
 
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert("Permission Denied", "Camera permission is required to use this feature.");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      console.log("Image captured:", result.assets[0].uri);
-
-      // Handle the captured image, e.g., upload it to your API
-      const formData = new FormData();
-      formData.append("image", {
-        uri: result.assets[0].uri,
-        name: "photo.jpg",
-        type: "image/jpeg",
+      // Launch the camera
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Image,
+        quality: 1,
       });
-      formData.append("EventUUID", eventUUID);
-      formData.append("UserId", userId);
 
-      fetch("https://guest-event-app.onrender.com/api/uploadImage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        body: formData,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status_code === 200) {
-            Alert.alert("Success", "Image uploaded successfully!");
-          } else {
-            Alert.alert("Error", "Failed to upload image.");
-          }
-        })
-        .catch((error) => {
-          console.error("Upload error:", error);
-          Alert.alert("Error", "Something went wrong.");
+      if (!result.canceled) {
+        console.log("Image captured:", result.assets[0].uri);
+
+        // Prepare FormData for the API request
+        const formData = new FormData();
+        formData.append("EventUUID", eventUUID); // Add EventUUID
+        formData.append("UserId", userId); // Add UserId
+
+        // Determine the MIME type based on file extension or provide a default
+        const uri = result.assets[0].uri;
+        const fileName = uri.split('/').pop();
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+        
+        let mimeType;
+        switch (fileExtension) {
+          case 'jpg':
+          case 'jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case 'png':
+            mimeType = 'image/png';
+            break;
+          case 'gif':
+            mimeType = 'image/gif';
+            break;
+          case 'bmp':
+            mimeType = 'image/bmp';
+            break;
+          case 'webp':
+            mimeType = 'image/webp';
+            break;
+          default:
+            mimeType = 'application/octet-stream'; 
+            break;
+        }
+
+        formData.append("Image", {
+          uri: uri,
+          name: fileName,
+          type: mimeType,
         });
-    }
-  };
 
-  const openMediaScreen = () => {
-    setMenuVisible(false);
-    navigation.navigate("MediaScreen", { eventUUID, userId });
+        console.log("FormData prepared:", formData);
+
+        fetch("https://guest-event-app.onrender.com/api/ImagebyUserInsert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Upload response:", data);
+            if (data.status_code === 200) {
+              Alert.alert("Success", "Image uploaded successfully!");
+              console.log("Uploaded Data:", data.Data); // Log uploaded data for verification
+            } else {
+              Alert.alert("Error", data.message || "Failed to upload image.");
+              console.error("Upload error:", data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Upload error:", error);
+            Alert.alert("Error", "Something went wrong.");
+          });
+      } else {
+        console.log("Camera was closed without taking a photo.");
+      }
+    } catch (error) {
+      console.error("Error launching camera:", error);
+      Alert.alert("Error", "Unable to open the camera.");
+    }
   };
 
   return (
@@ -123,7 +159,6 @@ const EventDetails = ({ route, navigation }) => {
                 />
               </View>
             )}
-
             <Text style={styles.eventName}>{eventDetails?.CoupleName}</Text>
 
             {/* Event details */}
@@ -192,12 +227,15 @@ const EventDetails = ({ route, navigation }) => {
             <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
               <Icon name="camera-outline" size={24} color="#FFF" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.footerButton} onPress={openMediaScreen}>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => navigation.navigate("MediaScreen", { eventUUID, userId })}
+            >
               <Icon name="images-outline" size={24} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => navigation.navigate("Vendors", { eventUUID })} // Pass eventUUID to Vendors screen
+              onPress={() => navigation.navigate("Vendors", { eventUUID })}
             >
               <Icon name="business-outline" size={24} color="#FFF" />
             </TouchableOpacity>
@@ -212,7 +250,7 @@ const styles = StyleSheet.create({
   gradientContainer: { flex: 1, backgroundColor: "transparent" },
   safeArea: { flex: 1 },
   mainContainer: { flex: 1, flexDirection: "column" },
-  container: { padding: 16, paddingBottom: 100 }, // Added padding to make room for footer
+  container: { padding: 16, paddingBottom: 100 },
   loadingText: { textAlign: "center", marginTop: 20 },
   errorText: { textAlign: "center", color: "red" },
   imageWrapper: {
@@ -223,6 +261,9 @@ const styles = StyleSheet.create({
   eventImage: {
     width: "100%",
     height: "100%",
+    borderRadius: 10,
+    overflow: 'hidden',
+    resizeMode: 'cover',
   },
   eventName: {
     fontSize: 24,
@@ -235,39 +276,47 @@ const styles = StyleSheet.create({
   eventDescription: {
     fontSize: 16,
     marginTop: 12,
+    marginBottom :20,
+   },
+   rsvpButton:{
+     alignSelf:"flex-start",
+     paddingVertical :10,
+     paddingHorizontal :15,
+     marginTop :5,
+     backgroundColor:"#D08A76",
+     borderRadius :10,
+     alignItems:"center",
+   },
+   buttonContainer:{
+     marginTop :20,
+   },
+   buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#FFF', 
   },
-  rsvpButton: {
-    alignSelf: "flex-start",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginTop: 5,
-    backgroundColor: "#D08A76",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonText: { color: "#fff", fontSize: 16 },
-  buttonContainer: { marginTop: 20 },
-  ViewDetails: {
-    marginVertical: 10,
-    paddingVertical: 12,
-    backgroundColor: "#D08A76",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  // Footer 
-  footer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    backgroundColor: "#D08A76",
-    paddingVertical: 10,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  footerButton: {
-    alignItems: "center",
-  },
+   ViewDetails:{
+     marginVertical :10,
+     paddingVertical :12,
+     backgroundColor:"#D08A76",
+     borderRadius :10,
+     alignItems:"center"
+   },
+
+   // Footer 
+   footer:{
+     flexDirection:"row",
+     justifyContent:"space-around",
+     backgroundColor:"#D08A76",
+     paddingVertical :10,
+     position:"absolute",
+     bottom :0,
+     left :0,
+     right :0
+   },
+   footerButton:{
+     alignItems:"center"
+   },
 });
 
 export default EventDetails;
