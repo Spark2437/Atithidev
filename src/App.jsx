@@ -1,47 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
-// import { UserProvider, useUserContext } from "./contexts/UserContext";  // Commented out UserContext logic
+import { UserProvider, useUserContext } from "./contexts/UserContext"; 
 import AuthNavigator from "./Navigator/AuthNavigator";
 import MainNavigator from "./Navigator/MainNavigator";
-// import AsyncStorage from "@react-native-async-storage/async-storage"; // Commented out AsyncStorage logic
+
 
 const App = () => {
-  // const { UserID, setUserID } = useUserContext(); // Commented out UserID and state logic
-  // const [isChecked, setIsChecked] = useState(false); // Commented out state logic
+  const { UserId, token } = useUserContext(); 
 
-  // useEffect(() => {
-  //   const checkUserStatus = async () => {
-  //     try {
-  //       const storedUserID = await AsyncStorage.getItem("UserID"); // Commented out AsyncStorage logic
-  //       if (storedUserID) {
-  //         setUserID(storedUserID); // Commented out UserID setting logic
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching UserID from AsyncStorage", error);
-  //     } finally {
-  //       setIsChecked(true); // Commented out state update logic
-  //     }
-  //   };
+  // Check if both UserId and token are available
+  const isAuthenticated = UserId && token;
 
-  //   checkUserStatus();
-  // }, [setUserID]);
 
-  // if (!isChecked) {
-  //   return null; // Commented out logic for loading state
-  // }
+  console.log("UserId:", UserId); 
+  console.log("Token:", token);   
+  console.log("IsAuthenticated:", isAuthenticated); 
 
   return (
     <NavigationContainer>
-      {/* Always start from AuthNavigator */}
-      <AuthNavigator />
+      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />} 
     </NavigationContainer>
   );
 };
 
-// const AppWithProvider = () => (
-//   <UserProvider>
-//     <App />
-//   </UserProvider>
-// ); // Commented out UserProvider logic
+const AppWithProvider = () => (
+  <UserProvider>
+    <App />
+  </UserProvider>
+);
 
-export default App;
+export default AppWithProvider;

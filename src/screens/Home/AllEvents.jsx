@@ -2,33 +2,53 @@ import React, { useEffect, useState } from "react";
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { useUserContext } from "../../contexts/UserContext"; // Import UserContext
 
 const AllEvents = ({ navigation }) => {
+  const { UserId, token } = useUserContext(); 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("https://guest-event-app.onrender.com/api/Upcomingevent", { 
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
+    const fetchEvents = async () => {
+      if (!UserId || !token) return; 
+      
+      console.log("Making API call with:", { UserId, token });
+  
+      try {
+        const response = await fetch("https://guest-event-app.onrender.com/api/UpcomingeventNew", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+            "UserId": UserId,  
+          },
+          body: JSON.stringify({ UserId, token }),  
+        });
+  
+        const data = await response.json();
+        console.log("API Response:", data);  
+  
         if (data.status_code === 200) {
           setEvents(data.Data); 
         } else {
-          setError("Failed to fetch events.");
+          setError(data.Remark || "Failed to fetch events.");
         }
-      })
-      .catch((err) => setError("Error fetching events: " + err.message))
-      .finally(() => setLoading(false));
-  }, []);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+        setError("Error fetching events: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchEvents();
+  }, [UserId, token]);
+  
 
-  const handleEventPress = (event, userId) => {
-    // Pass the EventUUID and UserId to SplashScreenEvents
+  const handleEventPress = (event) => {
+    console.log("Navigating to SplashScreenEvents with EventUUID:", event.EventUUID); // Debug: Log EventUUID
     navigation.navigate("SplashScreenEvents", {
       eventUUID: event.EventUUID,
     });
@@ -41,8 +61,6 @@ const AllEvents = ({ navigation }) => {
       style={styles.gradientContainer}
     >
       <SafeAreaView style={{ flex: 1 }}>
-       
-
         <ScrollView contentContainerStyle={styles.eventList}>
           {loading ? (
             <Text style={styles.loadingText}>Loading events...</Text>
@@ -68,7 +86,6 @@ const AllEvents = ({ navigation }) => {
                     </Text>
                     <Text style={styles.eventLocation}>{event.EventCity}</Text>
                     <Text style={styles.eventVenue}>Venue: {event.EventVenue}</Text>
-                    
                     <Text style={styles.eventDate}>
                       Starts: {new Date(event.EventStartDate).toLocaleString()}
                     </Text>
@@ -88,23 +105,14 @@ const AllEvents = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   gradientContainer: { flex: 1, flexDirection: "column", backgroundColor: "transparent" },
-  headerContainer: {
-    width: "100%",
-    padding: 6,
-    backgroundColor: "#D08A76",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  
   eventList: {
     paddingBottom: 16,
   },
   eventCard: {
     flexDirection: "column",
     backgroundColor: "#fff",
-    marginTop:30, 
+    marginTop:30,
     borderRadius: 10,
-    
     overflow: "hidden",
     elevation: 4,
     marginLeft: 10,

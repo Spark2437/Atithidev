@@ -1,16 +1,17 @@
 import React, { useState, useRef } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator, Alert, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useUserContext } from "../../contexts/UserContext";
 
 const OTPScreen = ({ route, navigation }) => {
-  const { mobile, name } = route.params;
-  const [Otp, setOtp] = useState(["", "", "", ""]); // 4 OTP digits
-  const [isLoading, setIsLoading] = useState(false);
-
-  const inputRefs = useRef([]);
-
+  const { mobile, name } = route.params;  
+  const [Otp, setOtp] = useState(["", "", "", ""]);  
+  const [isLoading, setIsLoading] = useState(false);  
+  
+  const inputRefs = useRef([]);  
+  const { saveUserData } = useUserContext();  
   const handleVerifyOTP = async () => {
-    if (Otp.some((digit) => digit === "")) {
+    if (Otp.some((digit) => digit === "")) {  
       Alert.alert("Error", "Please enter the OTP.");
       return;
     }
@@ -18,17 +19,26 @@ const OTPScreen = ({ route, navigation }) => {
     setIsLoading(true);
 
     try {
-      const otpString = Otp.join(""); // Combine OTP digits into a single string
+      const otpString = Otp.join("");  
 
+      // Call the API for OTP verification
       const response = await fetch("https://guest-event-app.onrender.com/api/Verify-Otp1", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mobile, name, Otp: otpString }),
+        body: JSON.stringify({ mobile, name, Otp: otpString }),  
       });
 
       const data = await response.json();
       if (data.status_code === 200 && data.Profile) {
-        navigation.navigate("Main");
+        // Successfully verified OTP, extract UserId and token from the response
+        const userId = data.Profile.UserId;
+        const token = data.Profile.token;
+
+        // Save UserId and token in context 
+        await saveUserData(userId, token);
+
+        // Navigate to Main screen
+        navigation.replace("Main");  
       } else {
         Alert.alert("Error", "OTP verification failed. Please try again.");
       }
@@ -41,20 +51,20 @@ const OTPScreen = ({ route, navigation }) => {
   };
 
   const handleChangeText = (text, index) => {
-    if (text.length > 1) return; // Only one digit per box
+    if (text.length > 1) return;  
 
     const newOtp = [...Otp];
     newOtp[index] = text;
     setOtp(newOtp);
 
     if (text && index < Otp.length - 1) {
-      inputRefs.current[index + 1].focus(); // Move to the next input
+      inputRefs.current[index + 1].focus(); 
     }
   };
 
   const handleKeyPress = (e, index) => {
     if (e.nativeEvent.key === "Backspace" && index > 0 && Otp[index] === "") {
-      inputRefs.current[index - 1].focus(); // Move to the previous input if backspace is pressed
+      inputRefs.current[index - 1].focus();  
     }
   };
 
@@ -68,8 +78,8 @@ const OTPScreen = ({ route, navigation }) => {
               key={index}
               ref={(ref) => inputRefs.current[index] = ref}
               value={digit}
-              onChangeText={(text) => handleChangeText(text, index)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
+              onChangeText={(text) => handleChangeText(text, index)} 
+              onKeyPress={(e) => handleKeyPress(e, index)} 
               keyboardType="numeric"
               maxLength={1}
               style={styles.otpBox}
@@ -77,8 +87,8 @@ const OTPScreen = ({ route, navigation }) => {
           ))}
         </View>
         <TouchableOpacity
-          style={[styles.button, isLoading && styles.buttonDisabled]}
-          onPress={handleVerifyOTP}
+          style={[styles.button, isLoading && styles.buttonDisabled]}  
+          onPress={handleVerifyOTP}  
           disabled={isLoading}
         >
           {isLoading ? (
@@ -104,7 +114,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    maxWidth: 400, // Optional: Limiting the max width for better control
+    maxWidth: 400,
   },
   heading: {
     fontSize: 24,
@@ -114,8 +124,8 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: "row",
-    justifyContent: "center", // Center the OTP boxes horizontally
-    width: "60%",  // or adjust as per your preference
+    justifyContent: "center",
+    width: "60%",
     marginBottom: 40,
   },
   otpBox: {
