@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   Linking,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient"; // Importing LinearGradient from expo
+import { LinearGradient } from "expo-linear-gradient"; 
 
 const NextEvent = ({ route, navigation }) => {
-  const { eventUUID } = route.params; // Get the eventUUID from route params
+  const { eventUUID } = route.params; 
   const [nextEvent, setNextEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,12 +22,12 @@ const NextEvent = ({ route, navigation }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ EventUUID: eventUUID }), // Pass the eventUUID to fetch next event
+      body: JSON.stringify({ EventUUID: eventUUID }), 
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.status_code === 200 && data.Data.length > 0) {
-          setNextEvent(data.Data[0]); // Set the next event data
+          setNextEvent(data.Data[0]); 
         } else {
           setError("Failed to fetch next event details.");
         }
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: "100%",
-    height: 150,
+    height: 350,
     resizeMode: "cover",
   },
   locationImage: {

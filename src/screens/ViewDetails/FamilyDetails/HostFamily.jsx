@@ -3,10 +3,10 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
 function HostFamily({ route, navigation }) {
-  // Extract the eventUUID from route.params
+  
   const { eventUUID } = route.params;
-  console.log("Event UUID:", eventUUID); // Log the eventUUID to the console
-
+  console.log("Event UUID:", eventUUID); 
+  
   const fetchFamilyDetails = async (side) => {
     try {
       const response = await fetch('https://guest-event-app.onrender.com/api/Familydetailsbyuuid', {
@@ -16,17 +16,17 @@ function HostFamily({ route, navigation }) {
         },
         body: JSON.stringify({
           EventUUID: eventUUID,
-          Side: side, // Pass 'Groom' or 'Bride' based on the card clicked
+          Side: side, 
         }),
       });
 
       const data = await response.json();
       if (data.status_code === 200) {
-        // Handle the response and navigate to the details page with the fetched data
+       
         navigation.navigate(side + "FamilyDetails", {
           familyDetails: data,
-          eventUUID: eventUUID, // Pass eventUUID as well
-          side: side, // Pass side ('Groom' or 'Bride')
+          eventUUID: eventUUID, 
+          side: side, 
         });
       } else {
         console.error("Error fetching data:", data.Remark);

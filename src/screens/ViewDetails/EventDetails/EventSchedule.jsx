@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native"; // Import for navigation
+import { useNavigation } from "@react-navigation/native"; 
 
 const EventSchedule = ({ route }) => {
   const { eventUUID } = route.params;
@@ -17,7 +17,7 @@ const EventSchedule = ({ route }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const navigation = useNavigation(); // Initialize navigation
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchEventSchedule = async () => {
@@ -70,8 +70,8 @@ const EventSchedule = ({ route }) => {
                 style={styles.scheduleCard}
                 onTouchEnd={() => {
                   navigation.navigate("Schedule", {
-                    eventUUID: eventUUID, // Passing eventUUID
-                    subEventUUID: subEvent.SubEventUUID, // Passing SubEventUUID
+                    eventUUID: eventUUID, 
+                    subEventUUID: subEvent.SubEventUUID, 
                   });
                 }}
               >

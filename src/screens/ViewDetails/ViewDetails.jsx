@@ -9,20 +9,18 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient"; // Import LinearGradient
-
+import { LinearGradient } from "expo-linear-gradient"; 
 const ViewDetails = ({ route }) => {
-  const navigation = useNavigation(); // Get the navigation object using the hook
-  const { eventUUID } = route.params; // Extract the eventUUID from route.params
+  const navigation = useNavigation(); 
+  const { eventUUID } = route.params; 
 
-  // Log the eventUUID to verify it's being passed correctly
   console.log("Event UUID in ViewDetails:", eventUUID);
 
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
       locations={[0.3, 0.9]}
-      style={styles.gradientContainer} // Apply gradient to the entire background
+      style={styles.gradientContainer} 
     >
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -31,7 +29,7 @@ const ViewDetails = ({ route }) => {
             style={styles.card}
             onPress={() =>
               navigation.navigate("HostFamily", {
-                eventUUID: eventUUID, // Pass the eventUUID to the EventSchedule screen
+                eventUUID: eventUUID, 
               })
             }
           >
@@ -56,7 +54,7 @@ const ViewDetails = ({ route }) => {
             style={styles.card}
             onPress={() =>
               navigation.navigate("EventSchedule", {
-                eventUUID: eventUUID, // Pass the eventUUID to the EventSchedule screen
+                eventUUID: eventUUID, 
               })
             }
           >
@@ -76,21 +74,25 @@ const ViewDetails = ({ route }) => {
             </View>
           </TouchableOpacity>
 
-          {/* Card 3: Travel and Accommodation 
+          {/* Card 3: Travel and Local Attractions 
           <TouchableOpacity
             style={styles.card}
-            onPress={() => navigation.navigate("Travel")}
+            onPress={() =>
+              navigation.navigate("Travel", {
+                eventUUID: eventUUID, 
+              })
+            }
           >
             <View style={styles.imageContainer}>
               <Image
                 source={{
-                  uri: "https://via.placeholder.com/80",
+                  uri: "https://travellerkaka.com/wp-content/uploads/2024/06/Top-10-Must-Visit-Destinations-in-North-India.png",
                 }}
                 style={styles.image}
               />
             </View>
             <View style={styles.textContainer}>
-              <Text style={styles.title}>Travel and Accommodation</Text>
+              <Text style={styles.title}>Travel and Local Attractions</Text>
               <Text style={styles.description}>
                 Accommodation details for guests attending the wedding.
               </Text>
