@@ -71,10 +71,11 @@ const ViewDetails = ({ route }) => {
               <Text style={styles.description}>
                 Detailed schedule for all wedding events.
               </Text>
+
             </View>
           </TouchableOpacity>
 
-          {/* Card 3: Travel and Local Attractions 
+          {/* Card 3: Travel and Local Attractions */}
           <TouchableOpacity
             style={styles.card}
             onPress={() =>
@@ -97,7 +98,7 @@ const ViewDetails = ({ route }) => {
                 Accommodation details for guests attending the wedding.
               </Text>
             </View>
-          </TouchableOpacity> */}
+          </TouchableOpacity> 
 
           {/* Card 4: Sagun Card 
           <TouchableOpacity

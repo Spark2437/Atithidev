@@ -14,16 +14,17 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 
 const EventDetails = ({ route, navigation }) => {
-  const { eventUUID } = route.params;
+  const { eventUUID, UserId } = route.params;  
 
   const [eventDetails, setEventDetails] = useState(null);
-  const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [circleImage, setCircleImage] = useState(null);
 
   useEffect(() => {
     console.log("Fetching event details for EventUUID:", eventUUID);
-    fetch("https://guest-event-app.onrender.com/api/eventdetailsbyuuid", {
+
+    fetch("https://guest-event-app.onrender.com/api/eventdetailsbyuuid", { 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -35,9 +36,6 @@ const EventDetails = ({ route, navigation }) => {
         console.log("Received data:", data);
         if (data.status_code === 200 && data.Data.length > 0) {
           setEventDetails(data.Data[0]);
-          const fetchedUserId = data.Data[0]?.UserId;
-          console.log("Fetched UserId:", fetchedUserId);
-          setUserId(fetchedUserId);
         } else {
           setError("Failed to fetch event details.");
           console.error("Error fetching event details:", data.Remark);
@@ -48,6 +46,25 @@ const EventDetails = ({ route, navigation }) => {
         console.error("Fetch error:", err);
       })
       .finally(() => setLoading(false));
+
+    fetch("https://guest-event-app.onrender.com/api/StoryMainIcon", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ EventUUID: eventUUID }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status_code === 200 && data.Data?.Image) {
+          setCircleImage(data.Data.Image);
+        } else {
+          console.error("Error fetching circle image:", data.message);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching circle image:", err);
+      });
   }, [eventUUID]);
 
   if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
@@ -55,14 +72,13 @@ const EventDetails = ({ route, navigation }) => {
 
   const openCamera = async () => {
     try {
-      // Request camera permissions
+      console.log("Requesting camera permissions...");
       const { status } = await ImagePicker.requestCameraPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission Denied", "Camera permission is required to use this feature.");
         return;
       }
 
-      // Launch the camera
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Image,
         quality: 1,
@@ -71,16 +87,14 @@ const EventDetails = ({ route, navigation }) => {
       if (!result.canceled) {
         console.log("Image captured:", result.assets[0].uri);
 
-        // Prepare FormData for the API request
         const formData = new FormData();
-        formData.append("EventUUID", eventUUID); // Add EventUUID
-        formData.append("UserId", userId); // Add UserId
+        formData.append("EventUUID", eventUUID);
+        formData.append("UserId", UserId); 
 
-        // Determine the MIME type based on file extension or provide a default
         const uri = result.assets[0].uri;
         const fileName = uri.split('/').pop();
         const fileExtension = fileName.split('.').pop().toLowerCase();
-        
+
         let mimeType;
         switch (fileExtension) {
           case 'jpg':
@@ -100,7 +114,7 @@ const EventDetails = ({ route, navigation }) => {
             mimeType = 'image/webp';
             break;
           default:
-            mimeType = 'application/octet-stream'; 
+            mimeType = 'application/octet-stream';
             break;
         }
 
@@ -115,7 +129,7 @@ const EventDetails = ({ route, navigation }) => {
         fetch("https://guest-event-app.onrender.com/api/ImagebyUserInsert", {
           method: "POST",
           headers: {
-            "Content-Type": "multipart/form-data",
+            "Content-Type": "multipart/form-data", 
           },
           body: formData,
         })
@@ -124,7 +138,7 @@ const EventDetails = ({ route, navigation }) => {
             console.log("Upload response:", data);
             if (data.status_code === 200) {
               Alert.alert("Success", "Image uploaded successfully!");
-              console.log("Uploaded Data:", data.Data); 
+              console.log("Uploaded Data:", data.Data);
             } else {
               Alert.alert("Error", data.message || "Failed to upload image.");
               console.error("Upload error:", data.message);
@@ -154,86 +168,111 @@ const EventDetails = ({ route, navigation }) => {
             {eventDetails?.EventImage && (
               <View style={styles.imageWrapper}>
                 <Image
-                  source={{ uri: eventDetails.EventImage}}
+                  source={{ uri: eventDetails.EventImage }}
                   style={styles.eventImage}
                 />
+
+                {circleImage && (
+                  <TouchableOpacity
+                    style={styles.circleButton}
+                    onPress={() => {
+                      console.log("Navigating to OurStory with eventUUID:", eventUUID);
+                      navigation.navigate("OurStory", { eventUUID });
+                    }}
+                  >
+                    <Image source={{ uri: circleImage }} style={styles.circleImage} />
+                  </TouchableOpacity>
+                )}
               </View>
             )}
             <Text style={styles.eventName}>{eventDetails?.CoupleName}</Text>
 
-            {/* Event details */}
-            <Text style={styles.eventDetails}>
-              <Text style={styles.boldText}>Location:</Text> {eventDetails?.EventCity}
-            </Text>
-            <Text style={styles.eventDetails}>
-              <Text style={styles.boldText}>Venue:</Text> {eventDetails?.EventVenue}
-            </Text>
-            <Text style={styles.eventDetails}>
-              <Text style={styles.boldText}>Start Date:</Text>{" "}
-              {new Date(eventDetails?.EventStartDate).toLocaleDateString()}
-            </Text>
-            <Text style={styles.eventDetails}>
-              <Text style={styles.boldText}>End Date:</Text>{" "}
-              {new Date(eventDetails?.EventEndDate).toLocaleDateString()}
-            </Text>
-            <Text style={styles.eventDetails}>
-              <Text style={styles.boldText}>Organizer:</Text>{" "}
-              {eventDetails?.EventOrganizer}
-            </Text>
+            <View style={styles.detailsContainer}>
+              <View style={styles.eventDetailsContainer}>
+                <Text style={styles.eventDetails}>
+                  <Text style={styles.boldText}>Location:</Text> {eventDetails?.EventCity}
+                </Text>
+                <Text style={styles.eventDetails}>
+                  <Text style={styles.boldText}>Venue:</Text> {eventDetails?.EventVenue}
+                </Text>
+                <Text style={styles.eventDetails}>
+                  <Text style={styles.boldText}>Start Date:</Text>{" "}
+                  {new Date(eventDetails?.EventStartDate).toLocaleDateString()}
+                </Text>
+                <Text style={styles.eventDetails}>
+                  <Text style={styles.boldText}>End Date:</Text>{" "}
+                  {new Date(eventDetails?.EventEndDate).toLocaleDateString()}
+                </Text>
+                <Text style={styles.eventDetails}>
+                  <Text style={styles.boldText}>Organizer:</Text>{" "}
+                  {eventDetails?.EventOrganizer}
+                </Text>
+              </View>
+            </View>
 
             <TouchableOpacity
               style={styles.rsvpButton}
-              onPress={() =>
+              onPress={() => {
+                console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
                 navigation.navigate("RSVPScreen", {
                   eventUUID: eventDetails?.EventUUID,
-                })
-              }
+                  UserId: UserId,
+                });
+              }}
             >
               <Text style={styles.buttonText}>RSVP</Text>
             </TouchableOpacity>
 
-            <Text style={styles.eventDescription}>{eventDetails?.EventDetails}</Text>
+            <View style={styles.eventDescriptionContainer}>
+              <Text style={styles.eventDescription}>{eventDetails?.EventDetails}</Text>
+            </View>
 
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={styles.ViewDetails}
-                onPress={() =>
+                onPress={() => {
+                  console.log("Navigating to ViewDetails with eventUUID:", eventDetails?.EventUUID);
                   navigation.navigate("ViewDetails", {
                     eventUUID: eventDetails?.EventUUID,
-                  })
-                }
+                  });
+                }}
               >
                 <Text style={styles.buttonText}>View Details</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.ViewDetails}
-                onPress={() =>
+                onPress={() => {
+                  console.log("Navigating to NextEvent with eventUUID:", eventDetails?.EventUUID);
                   navigation.navigate("NextEvent", {
                     eventUUID: eventDetails?.EventUUID,
-                  })
-                }
+                  });
+                }}
               >
                 <Text style={styles.buttonText}>Event Starts Here</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
 
-          {/* Footer */}
           <View style={styles.footer}>
-          
             <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
               <Icon name="camera-outline" size={24} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => navigation.navigate("MediaScreen", { eventUUID, userId })}
+              onPress={() => {
+                console.log("Navigating to MediaScreen with eventUUID and UserId:", eventUUID, UserId);
+                navigation.navigate("MediaScreen", { eventUUID, UserId });
+              }}
             >
               <Icon name="images-outline" size={24} color="#FFF" />
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={() => navigation.navigate("Vendors", { eventUUID })}
+              onPress={() => {
+                console.log("Navigating to Vendors with eventUUID:", eventUUID);
+                navigation.navigate("Vendors", { eventUUID });
+              }}
             >
               <Icon name="business-outline" size={24} color="#FFF" />
             </TouchableOpacity>
@@ -245,76 +284,101 @@ const EventDetails = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  gradientContainer: { flex: 1, backgroundColor: "transparent" },
+  gradientContainer: { flex: 1 },
   safeArea: { flex: 1 },
-  mainContainer: { flex: 1, flexDirection: "column" },
-  container: { padding: 16, paddingBottom: 100 },
+  mainContainer: { flex: 1 },
+  container: { padding: 16 },
   loadingText: { textAlign: "center", marginTop: 20 },
   errorText: { textAlign: "center", color: "red" },
+
   imageWrapper: {
-    position: "relative",
     width: "100%",
     height: 400,
+    borderRadius: 10,
+    overflow: "hidden",
+    position: "relative", 
   },
+
   eventImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 10,
-    overflow: 'hidden',
-    resizeMode: 'cover',
+    resizeMode: "cover",
   },
+  
   eventName: {
     fontSize: 24,
     fontWeight: "bold",
     marginVertical: 12,
     textAlign: "left",
   },
+
   eventDetails: { fontSize: 14, marginBottom: 8 },
   boldText: { fontWeight: "bold" },
+
+  rsvpButton: {
+    alignSelf: "flex-start",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: "#D08A76",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  eventDescriptionContainer: {
+    marginTop: 10,
+  },
+
   eventDescription: {
     fontSize: 16,
-    marginTop: 12,
-    marginBottom :20,
-   },
-   rsvpButton:{
-     alignSelf:"flex-start",
-     paddingVertical :10,
-     paddingHorizontal :15,
-     marginTop :5,
-     backgroundColor:"#D08A76",
-     borderRadius :10,
-     alignItems:"center",
-   },
-   buttonContainer:{
-     marginTop :20,
-   },
-   buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFF', 
+    marginBottom: 20,
   },
-   ViewDetails:{
-     marginVertical :10,
-     paddingVertical :12,
-     backgroundColor:"#D08A76",
-     borderRadius :10,
-     alignItems:"center"
-   },
 
-   // Footer 
-   footer:{
-     flexDirection:"row",
-     justifyContent:"space-around",
-     backgroundColor:"#D08A76",
-     paddingVertical :10,
-     position:"absolute",
-     bottom :0,
-     left :0,
-     right :0
-   },
-   footerButton:{
-     alignItems:"center"
-   },
+  buttonContainer: {
+    marginTop: 20,
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
+  },
+
+  ViewDetails: {
+    marginVertical: 10,
+    paddingVertical: 12,
+    backgroundColor: "#D08A76",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#D08A76",
+    paddingVertical: 10,
+  },
+
+  footerButton: {
+    alignItems: "center",
+  },
+
+  circleButton: {
+    position: "absolute",
+    bottom: 5,
+    right: 5,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+
+  circleImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 30,
+    resizeMode: "cover",
+  },
 });
 
 export default EventDetails;

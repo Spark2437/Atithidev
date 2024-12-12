@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Image, Text, StyleSheet } from "react-native";
 
 const SplashScreenEvents = ({ route, navigation }) => {
-  const { eventUUID } = route.params;
+  const { eventUUID, UserId } = route.params; 
   const [splashData, setSplashData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -12,7 +12,7 @@ const SplashScreenEvents = ({ route, navigation }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ EventUUID: eventUUID }),
+      body: JSON.stringify({ EventUUID: eventUUID, UserId: UserId }),  // Sending UserId with the request
     })
       .then((response) => response.json())
       .then((data) => {
@@ -29,11 +29,12 @@ const SplashScreenEvents = ({ route, navigation }) => {
       .finally(() => setLoading(false));
 
     const timer = setTimeout(() => {
-      navigation.replace("EventDetails", { eventUUID });
+      // Pass both eventUUID and UserId to EventDetails
+      navigation.replace("EventDetails", { eventUUID, UserId });  // Passing UserId along with eventUUID
     }, 3000); // Navigate to EventDetails after 3 seconds
 
     return () => clearTimeout(timer);
-  }, [eventUUID,navigation]);
+  }, [eventUUID, UserId, navigation]);  // Add UserId as a dependency
 
   if (loading) {
     return <Text style={styles.loadingText}>Loading splash screen...</Text>;
@@ -51,10 +52,28 @@ const SplashScreenEvents = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#F1D3B3" },
-  image: { width: "100%", height: "100%", resizeMode: "cover" },
-  loadingText: { textAlign: "center", marginTop: 20 },
-  noImageText: { textAlign: "center", marginTop: 20, fontSize: 16, color: "red" },
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#F1D3B3",
+  },
+  image: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  loadingText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+  },
+  noImageText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "red",
+  },
 });
 
 export default SplashScreenEvents;

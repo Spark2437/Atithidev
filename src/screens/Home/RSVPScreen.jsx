@@ -1,48 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 const RSVP = ({ route, navigation }) => {
-  const { eventUUID } = route.params; 
-  const [userId, setUserId] = useState(null); 
-  const [response, setResponse] = useState(null); 
-  console.log("Event UUID:", eventUUID);  
+  const { eventUUID, UserId } = route.params; 
+  const [response, setResponse] = useState(null);
 
-  // Fetch Event Details and Extract UserId
-  useEffect(() => {
-    fetch("https://guest-event-app.onrender.com/api/eventdetailsbyuuid", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ EventUUID: eventUUID }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status_code === 200 && data.Data?.length > 0) {
-          setUserId(data.Data[0].UserId); 
-          console.log("Fetched UserId:", data.Data[0].UserId); 
-        } else {
-          Alert.alert("Error", "Unable to fetch User ID.");
-        }
-      })
-      .catch((err) => Alert.alert("Error", "Error fetching User ID: " + err.message));
-  }, [eventUUID]);
+  console.log("Event UUID:", eventUUID);
+  console.log("User ID:", UserId);  
 
-  // Handle RSVP submission
+  
   const handleSubmit = () => {
     if (!response) {
       Alert.alert("Incomplete", "Please select an option before submitting.");
       return;
     }
 
-    if (!userId) {
+    if (!UserId) {
       Alert.alert("Error", "User ID is missing.");
       return;
     }
 
     // Log the values before submitting
-    console.log("Submitting RSVP with UserId:", userId);
+    console.log("Submitting RSVP with UserId:", UserId);
     console.log("EventUUID:", eventUUID);
     console.log("Response:", response);
 
@@ -53,7 +33,7 @@ const RSVP = ({ route, navigation }) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        UserId: userId,
+        UserId: UserId,
         EventUUID: eventUUID,
         Status: response,
       }),

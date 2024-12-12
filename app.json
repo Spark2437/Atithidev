@@ -20,7 +20,6 @@
       "permissions": [
         "CAMERA"
       ],
-      "versionCode": 4,
       "buildProperties": {
         "enableProguardInReleaseBuilds": true,
         "extraProguardRules": "-keep class com.spark2437.Atithidev.** { *; }"

@@ -19,7 +19,7 @@ const AllEvents = ({ navigation }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false); // Modal visibility state
+  const [showModal, setShowModal] = useState(false); 
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -59,6 +59,7 @@ const AllEvents = ({ navigation }) => {
   const handleEventPress = (event) => {
     navigation.navigate("SplashScreenEvents", {
       eventUUID: event.EventUUID,
+      UserId: UserId,
     });
   };
 

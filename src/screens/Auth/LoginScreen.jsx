@@ -49,7 +49,7 @@ const LoginScreen = () => {
       if (data.status_code === 200) {
         alert("OTP sent successfully");
 
-        // Navigate to OTP screen, passing name, mobile
+  
         navigation.navigate("OTPScreen", { name, mobile });  
       } else {
         alert("Error in sending OTP. Please try again.");
@@ -69,7 +69,7 @@ const LoginScreen = () => {
     >
       <Text style={styles.heading}>Enter Your Mobile Number</Text>
       
-      {/* Name input */}
+    
       <TextInput
         style={styles.input}
         placeholder="Name"
@@ -77,7 +77,7 @@ const LoginScreen = () => {
         onChangeText={setName}
       />
 
-      {/* Mobile input */}
+     
       <TextInput
         style={styles.input}
         placeholder="Mobile Number"
@@ -87,7 +87,7 @@ const LoginScreen = () => {
         maxLength={10}
       />
 
-      {/* Button to verify OTP */}
+  
       <TouchableOpacity
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleLogin}
@@ -126,14 +126,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   button: {
-    backgroundColor: "#D08A76",  // Matching the event button color
+    backgroundColor: "#D08A76",  
     padding: 15,
     borderRadius: 15,
     width: "100%",
     alignItems: "center",
   },
   buttonDisabled: {
-    backgroundColor: "#7da3d3", // Light disabled button color
+    backgroundColor: "#7da3d3",
   },
   buttonText: {
     color: "#fff",

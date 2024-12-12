@@ -14,7 +14,7 @@ import {
 const { width, height } = Dimensions.get("window");
 
 const MediaScreen = ({ route, navigation }) => {
-  const { eventUUID, userId } = route.params;
+  const { eventUUID, UserId } = route.params;
 
   const [imageData, setImageData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,16 +23,15 @@ const MediaScreen = ({ route, navigation }) => {
 
   useEffect(() => {
     console.log("Event UUID:", eventUUID);
-    console.log("User ID:", userId);
+    console.log("User ID:", UserId);
     console.log("Fetching media data...");
 
-    // Fetching media data
     fetch("https://guest-event-app.onrender.com/api/ImageGalleryList", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ EventUUID: eventUUID, UserId: userId }),
+      body: JSON.stringify({ EventUUID: eventUUID, UserId: UserId }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -49,7 +48,7 @@ const MediaScreen = ({ route, navigation }) => {
         setError("Failed to load media.");
         setLoading(false);
       });
-  }, [eventUUID, userId]);
+  }, [eventUUID, UserId]);
 
   if (loading) {
     return (

@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   imageContainer: {
     margin: 2,
-    width: "31%", // 3 images per row with spacing
+    width: "31%", 
   },
   image: {
     width: "100%",

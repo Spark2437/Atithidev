@@ -105,6 +105,7 @@ const EventSchedule = ({ route }) => {
 const styles = StyleSheet.create({
   gradientContainer: {
     flex: 1,
+    marginTop: 10,
   },
   headerContainer: {
     width: "100%",

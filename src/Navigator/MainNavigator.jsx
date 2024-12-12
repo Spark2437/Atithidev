@@ -3,6 +3,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import AllEvents from "../screens/Home/AllEvents";
 import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
 import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
+import OurStory from "../screens/Home/OurStory";
 import ViewDetails from "../screens/ViewDetails/ViewDetails";
 import RSVP from "../screens/Home/RSVPScreen";
 import MediaScreen from "../screens/Media/MediaScreen";
@@ -45,6 +46,12 @@ const MainNavigator = () => (
     <Stack.Screen
       name="EventDetails"
       component={EventDetailsScreen}
+      options={{ headerShown: false }}
+    />
+
+<Stack.Screen
+      name="OurStory"
+      component={OurStory}
       options={{ headerShown: false }}
     />
 
