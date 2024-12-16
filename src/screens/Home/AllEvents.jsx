@@ -5,9 +5,11 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   StyleSheet,
-  Modal,
-  Linking
+  Linking,
+  Animated,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,56 +17,155 @@ import { useUserContext } from "../../contexts/UserContext";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const AllEvents = ({ navigation }) => {
-  const { UserId, token } = useUserContext();
+  const { UserId, token, clearUserData } = useUserContext();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showModal, setShowModal] = useState(false); 
+  const [showProfile, setShowProfile] = useState(false);
+  const [profileData, setProfileData] = useState({
+    firstWord: "",
+    username: "",
+    mobileNumber: "",
+  });
+  const [slideAnim] = useState(
+    new Animated.Value(-Dimensions.get("window").width * 0.7)
+  );
+
+  const toggleProfile = () => {
+    console.log("Toggling profile visibility");
+    if (!showProfile) {
+      setShowProfile(true);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: -Dimensions.get("window").width * 0.7,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowProfile(false));
+    }
+  };
+
+  const fetchUserDetails = async () => {
+    console.log("Fetching user details");
+    if (!UserId || !token) {
+      console.log("UserId or token is missing");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://guest-event-app.onrender.com/api/Userdetailsbyuuid",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            UserId: UserId,
+          },
+          body: JSON.stringify({ UserId }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("User details response:", data);
+
+      if (data.status_code === 200) {
+        const userData = data.Data[0];
+        setProfileData({
+          firstWord: userData.FirstWord || "A",
+          username: userData.Username || "Username",
+          mobileNumber: userData.Mobile || "Mobile Number",
+        });
+      } else {
+        setError(data.Remark || "Failed to fetch user details.");
+      }
+    } catch (err) {
+      setError("Error fetching user details: " + err.message);
+      console.error("Error fetching user details:", err);
+    }
+  };
+
+  const fetchEvents = async () => {
+    console.log("Fetching events");
+    if (!UserId || !token) {
+      console.log("UserId or token is missing");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://guest-event-app.onrender.com/api/UpcomingeventNew",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            UserId: UserId,
+          },
+          body: JSON.stringify({ UserId, token }),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Events response:", data);
+
+      if (data.status_code === 200) {
+        setEvents(data.Data);
+      } else {
+        setError(data.Remark || "Failed to fetch events.");
+      }
+    } catch (err) {
+      setError("Error fetching events: " + err.message);
+      console.error("Error fetching events:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchEvents = async () => {
-      if (!UserId || !token) return;
-
-      try {
-        const response = await fetch(
-          "https://guest-event-app.onrender.com/api/UpcomingeventNew",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-              UserId: UserId,
-            },
-            body: JSON.stringify({ UserId, token }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (data.status_code === 200) {
-          setEvents(data.Data);
-        } else {
-          setError(data.Remark || "Failed to fetch events.");
-        }
-      } catch (err) {
-        setError("Error fetching events: " + err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    console.log("Fetching data on component mount or UserId/token change");
+    fetchUserDetails();
     fetchEvents();
   }, [UserId, token]);
 
   const handleEventPress = (event) => {
+    console.log("Event pressed:", event.EventUUID);
     navigation.navigate("SplashScreenEvents", {
       eventUUID: event.EventUUID,
       UserId: UserId,
     });
   };
 
-  const handleLinkPress = (url) => {
-    Linking.openURL(url);
+  const handleLogout = async () => {
+    console.log("Logging out");
+    try {
+      const response = await fetch("https://guest-event-app.onrender.com/api/Logoutbyuuid", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          UserId: UserId,
+        },
+        body: JSON.stringify({ UserId }),
+      });
+
+      const data = await response.json();
+      console.log("Logout response:", data);
+
+      if (data.status_code === 200) {
+        clearUserData();
+        console.log("User logged out, navigating to LoginScreen");
+        navigation.replace("LoginScreen");
+      } else {
+        console.error(data.Remark || "Failed to log out.");
+      }
+    } catch (err) {
+      console.error("Error logging out:", err);
+    }
   };
 
   return (
@@ -75,9 +176,9 @@ const AllEvents = ({ navigation }) => {
     >
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => setShowModal(true)}>
+          <TouchableOpacity onPress={toggleProfile}>
             <View style={styles.iconContainer}>
-              <Icon name="question" size={10} color="#fff" />
+              <Icon name="user" size={16} color="#fff" />
             </View>
           </TouchableOpacity>
         </View>
@@ -121,34 +222,54 @@ const AllEvents = ({ navigation }) => {
           )}
         </ScrollView>
 
-        {/* Modal for Privacy Policy */}
-        <Modal
-          visible={showModal}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setShowModal(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Privacy Policy</Text>
-              <ScrollView>
-                
-              </ScrollView>
-              <TouchableOpacity
-                style={styles.linkButton}
-                onPress={() => handleLinkPress("https://atithidev.com/privacy-policy")}
-              >
-                <Text style={styles.linkText}>Read Privacy Policy</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.closeButton}
-                onPress={() => setShowModal(false)}
-              >
-                <Text style={styles.closeButtonText}>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+        {/* Profile Sidebar */}
+        {showProfile && (
+          <TouchableWithoutFeedback onPress={() => setShowProfile(false)}>
+            <Animated.View
+              style={[
+                styles.profileSidebar,
+                { transform: [{ translateX: slideAnim }] },
+              ]}
+            >
+              <View style={styles.profileContent}>
+                <View style={styles.profileTop}>
+                  <TouchableOpacity>
+                    <View style={styles.profilePictureContainer}>
+                      <Text style={styles.profileInitials}>
+                        {profileData.firstWord?.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                  <Text style={styles.username}>{profileData.username}</Text>
+                  <Text style={styles.mobileNumber}>{profileData.mobileNumber}</Text>
+                </View>
+
+                <View style={styles.profileLine}></View>
+
+                <View style={styles.profileButtons}>
+                  <TouchableOpacity
+                    style={styles.buttonContainer}
+                    onPress={() =>
+                      Linking.openURL("https://atithidev.com/privacy-policy")
+                    }
+                  >
+                    <View style={styles.button}>
+                      <Text style={styles.buttonText}>Privacy Policy</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.buttonContainer}
+                    onPress={handleLogout} // Handle logout
+                  >
+                    <View style={styles.button}>
+                      <Text style={styles.buttonText}>Logout</Text>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Animated.View>
+          </TouchableWithoutFeedback>
+        )}
       </SafeAreaView>
     </LinearGradient>
   );
@@ -158,10 +279,10 @@ const styles = StyleSheet.create({
   gradientContainer: { flex: 1 },
   header: {
     position: "absolute",
-    right: 20,
+    left: 20,
     top: 40,
     zIndex: 1,
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     justifyContent: "flex-start",
   },
   iconContainer: {
@@ -172,75 +293,92 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  eventList: {
-    paddingBottom: 16,
-    paddingTop: 20,
+  profileSidebar: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: "70%",
+    backgroundColor: "#fff",
+    zIndex: 2,
+    elevation: 5,
+    padding: 20,
+    flexDirection: "column",
   },
-  modalContainer: {
+  profileContent: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    flexDirection: "column",
+    justifyContent: "space-between",
+  },
+  profileTop: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  profilePictureContainer: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    overflow: "hidden",
+    marginTop: 40,
+    marginBottom: 10,
+    borderWidth: 2,
+    borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
   },
-  modalContent: {
-    width: "90%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    maxHeight: "80%",
+  profileInitials: {
+    fontSize: 40,
+    color: "#fff",
+    backgroundColor: "#333",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    textAlign: "center",
+    lineHeight: 80,
   },
-  modalTitle: {
-    fontSize: 18,
+  profileLine: {
+    width: "100%",
+    height: 1,
+    backgroundColor: "#ccc",
+    marginVertical: 10,
+  },
+  username: {
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 10,
-  },
-  modalText: {
-    fontSize: 14,
-    lineHeight: 22,
     color: "#333",
+    marginTop: 10,
   },
-  linkButton: {
-    marginTop: 20,
-    backgroundColor: "black",
-    padding: 10,
-    borderRadius: 5,
+  mobileNumber: {
+    fontSize: 14,
+    color: "#333",
+    marginTop: 5,
+  },
+  profileButtons: {
+    marginTop: "auto",
     alignItems: "center",
   },
-  linkText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  closeButton: {
+  buttonContainer: {
     marginTop: 20,
-    backgroundColor: "black",
-    padding: 10,
-    borderRadius: 5,
+  },
+  button: {
+    alignSelf: "flex-start",
+    width: 200,
+    height: 50,
+    backgroundColor: "#D08A76",
+    borderRadius: 10,
     alignItems: "center",
+    justifyContent: "center",
   },
-  closeButtonText: {
-    color: "#fff",
+  buttonText: {
     fontSize: 16,
-  },
-
-  header: {
-    position: 'absolute',
-    right: 20,
-    top: 40,
-    zIndex: 1,
-    alignItems: 'flex-end',
-    justifyContent: 'flex-start',
-  },
-  iconContainer: {
-    width: 26,
-    height: 26,
-    borderRadius: 18,
-    backgroundColor: 'black',
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontWeight: "bold",
+    color: "#FFF",
   },
   eventList: {
     paddingBottom: 16,
-    paddingTop: 20
+    paddingTop: 20,
   },
   eventCard: {
     flexDirection: "column",
@@ -294,7 +432,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "red",
   },
-
 });
 
 export default AllEvents;

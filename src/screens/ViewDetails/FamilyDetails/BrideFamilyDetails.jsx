@@ -50,8 +50,8 @@ function BrideFamilyDetails({ route }) {
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={onScroll} // Track scrolling
-        scrollEventThrottle={16} // For smoother updates
+        onScroll={onScroll} 
+        scrollEventThrottle={16} 
       />
       <TouchableOpacity style={styles.arrowButtonLeft} onPress={goToPreviousSlide}>
         <Ionicons name="arrow-back" size={30} color="#fff" />

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Import LinearGradient
+import { LinearGradient } from 'expo-linear-gradient';
 
 const VendorDetails = ({ route }) => {
-  const { vendorUUID, eventUUID } = route.params; // Get vendorUUID and eventUUID from navigation params
+  const { vendorUUID, eventUUID } = route.params; 
   const [vendorDetails, setVendorDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch vendor details using VendorUUID and EventUUID
+
   useEffect(() => {
     const fetchVendorDetails = async () => {
       try {

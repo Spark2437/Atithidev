@@ -1,14 +1,14 @@
 import React, { useRef, useState } from "react";
 import { View, Image, FlatList, Dimensions, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Ensure you have this dependency installed
+import { Ionicons } from "@expo/vector-icons"; 
 
 const { width, height } = Dimensions.get("window");
 
 function GroomFamilyDetails({ route }) {
   const { familyDetails } = route.params;
   const members = familyDetails.Data || [];
-  const flatListRef = useRef(null); // Reference to the FlatList
-  const [currentIndex, setCurrentIndex] = useState(0); // State to track the current index
+  const flatListRef = useRef(null);
+  const [currentIndex, setCurrentIndex] = useState(0); 
 
   const renderItem = ({ item }) => (
     <View style={styles.imageWrapper}>

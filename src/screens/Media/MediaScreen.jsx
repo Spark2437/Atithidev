@@ -17,15 +17,13 @@ const MediaScreen = ({ route, navigation }) => {
   const { eventUUID, UserId } = route.params;
 
   const [imageData, setImageData] = useState([]);
+  const [storiesData, setStoriesData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedStory, setSelectedStory] = useState(null);
 
+  // Fetch image gallery
   useEffect(() => {
-    console.log("Event UUID:", eventUUID);
-    console.log("User ID:", UserId);
-    console.log("Fetching media data...");
-
     fetch("https://guest-event-app.onrender.com/api/ImageGalleryList", {
       method: "POST",
       headers: {
@@ -35,7 +33,6 @@ const MediaScreen = ({ route, navigation }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Fetched data:", data);
         if (data.status_code === 200 && data.data.length > 0) {
           setImageData(data.data);
         } else {
@@ -43,12 +40,46 @@ const MediaScreen = ({ route, navigation }) => {
         }
         setLoading(false);
       })
-      .catch((err) => {
-        console.log("Error fetching media:", err);
+      .catch(() => {
         setError("Failed to load media.");
         setLoading(false);
       });
   }, [eventUUID, UserId]);
+
+  // Fetch stories
+  useEffect(() => {
+    fetch("https://guest-event-app.onrender.com/api/UserStoriesList", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ EventUUID: eventUUID, UserId: UserId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status_code === 200 && data.data.length > 0) {
+          const storiesWithViewedStatus = data.data.map((story) => ({
+            ...story,
+            viewed: false, // Add a viewed property to each story
+          }));
+          setStoriesData(storiesWithViewedStatus);
+        }
+      })
+      .catch(() => {
+        console.log("Error fetching stories.");
+      });
+  }, [eventUUID, UserId]);
+
+  const handleViewStory = (story) => {
+    setSelectedStory(story.Image[0]?.Image);
+
+    // Mark story as viewed
+    setStoriesData((prevStories) =>
+      prevStories.map((item) =>
+        item === story ? { ...item, viewed: true } : item
+      )
+    );
+  };
 
   if (loading) {
     return (
@@ -69,6 +100,34 @@ const MediaScreen = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollView}>
+        {/* Stories Section */}
+        <View style={styles.storiesContainer}>
+          <Text style={styles.storiesHeading}>Stories</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {storiesData.map((story, index) => (
+              <View key={index} style={styles.storyCircleContainer}>
+                <TouchableOpacity onPress={() => handleViewStory(story)}>
+                  <View
+                    style={[
+                      styles.storyCircle,
+                      story.viewed && styles.storyViewedCircle,
+                    ]}
+                  >
+                    <Image
+                      source={{ uri: story.Image[0]?.Image }}
+                      style={styles.storyImage}
+                      resizeMode="cover"
+                    />
+                  </View>
+                </TouchableOpacity>
+                {/* Display user name below the story */}
+                <Text style={styles.storyUserName}>{story.Category}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Categories Section */}
         {imageData.map((category, index) => (
           <View key={index} style={styles.categoryContainer}>
             <View style={styles.categoryHeader}>
@@ -84,12 +143,11 @@ const MediaScreen = ({ route, navigation }) => {
                 <Text style={styles.seeAllText}>See All</Text>
               </TouchableOpacity>
             </View>
-
             <View style={styles.gridContainer}>
               {category.Image.slice(0, 6).map((imageItem, imgIndex) => (
                 <View key={imgIndex} style={styles.imageContainer}>
                   <TouchableOpacity
-                    onPress={() => setSelectedImage(imageItem.Image)}
+                    onPress={() => setSelectedStory(imageItem.Image)}
                   >
                     <Image
                       source={{ uri: imageItem.Image }}
@@ -104,20 +162,20 @@ const MediaScreen = ({ route, navigation }) => {
         ))}
       </ScrollView>
 
-      {/* Full-Screen Image Modal */}
-      {selectedImage && (
+      {/* Full-Screen Story Modal */}
+      {selectedStory && (
         <Modal
-          visible={!!selectedImage}
+          visible={!!selectedStory}
           transparent={true}
           animationType="fade"
-          onRequestClose={() => setSelectedImage(null)}
+          onRequestClose={() => setSelectedStory(null)}
         >
           <TouchableOpacity
             style={styles.fullScreenContainer}
-            onPress={() => setSelectedImage(null)}
+            onPress={() => setSelectedStory(null)}
           >
             <Image
-              source={{ uri: selectedImage }}
+              source={{ uri: selectedStory }}
               style={styles.fullScreenImage}
               resizeMode="contain"
             />
@@ -136,6 +194,40 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     padding: 20,
+  },
+  // Stories Section Styles
+  storiesContainer: {
+    marginBottom: 20,
+  },
+  storiesHeading: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  storyCircleContainer: {
+    alignItems: "center",
+    marginRight: 15,
+  },
+  storyCircle: {
+    borderWidth: 3,
+    borderColor: "#ff4500", // Highlight color for unviewed story
+    borderRadius: 40,
+    padding: 3,
+  },
+  storyViewedCircle: {
+    borderColor: "#ccc", // Muted color for viewed story
+  },
+  storyImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+  },
+  storyUserName: {
+    marginTop: 5,
+    fontSize: 14,
+    fontWeight: "500",
+    textAlign: "center",
+    color: "#333",
   },
   categoryContainer: {
     marginBottom: 20,
@@ -170,16 +262,15 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
-  // Full-Screen Image Modal Styles
   fullScreenContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "black",
   },
   fullScreenImage: {
     width: width,
     height: height,
-    backgroundColor: "black",
   },
 });
 

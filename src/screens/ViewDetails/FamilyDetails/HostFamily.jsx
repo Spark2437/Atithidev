@@ -38,9 +38,9 @@ function HostFamily({ route, navigation }) {
 
   return (
     <LinearGradient
-      colors={['rgba(232, 198, 188, 0.8)', 'rgba(146, 101, 89, 0.5)']} // Gradient colors
-      locations={[0.3, 0.9]} // Gradient location
-      style={styles.gradientContainer} // Applying gradient to the entire screen
+      colors={['rgba(232, 198, 188, 0.8)', 'rgba(146, 101, 89, 0.5)']} 
+      locations={[0.3, 0.9]}
+      style={styles.gradientContainer} 
     >
       <View style={styles.container}>
         {/* Groom Family Card */}

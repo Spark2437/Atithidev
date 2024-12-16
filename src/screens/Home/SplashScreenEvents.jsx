@@ -12,12 +12,12 @@ const SplashScreenEvents = ({ route, navigation }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ EventUUID: eventUUID, UserId: UserId }),  // Sending UserId with the request
+      body: JSON.stringify({ EventUUID: eventUUID, UserId: UserId }), 
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.status_code === 200) {
-          setSplashData(data.Data[0]); // Fetch the first event from the response
+          setSplashData(data.Data[0]); 
         } else {
           setSplashData({ EventImage: "default_image_url" });
         }
@@ -29,12 +29,12 @@ const SplashScreenEvents = ({ route, navigation }) => {
       .finally(() => setLoading(false));
 
     const timer = setTimeout(() => {
-      // Pass both eventUUID and UserId to EventDetails
-      navigation.replace("EventDetails", { eventUUID, UserId });  // Passing UserId along with eventUUID
-    }, 3000); // Navigate to EventDetails after 3 seconds
+    
+      navigation.replace("EventDetails", { eventUUID, UserId });  
+    }, 3000); 
 
     return () => clearTimeout(timer);
-  }, [eventUUID, UserId, navigation]);  // Add UserId as a dependency
+  }, [eventUUID, UserId, navigation]);  
 
   if (loading) {
     return <Text style={styles.loadingText}>Loading splash screen...</Text>;

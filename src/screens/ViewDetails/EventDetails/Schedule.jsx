@@ -7,7 +7,7 @@ const Schedule = ({ route }) => {
   const [subEventDetails, setSubEventDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [mapLink, setMapLink] = useState(null); // For storing map link
+  const [mapLink, setMapLink] = useState(null); 
 
   useEffect(() => {
     const fetchSubEventDetails = async () => {
@@ -53,12 +53,12 @@ const Schedule = ({ route }) => {
         const mapData = await response.json();
 
         if (mapData.status_code === 200 && mapData.Data) {
-          setMapLink(mapData.Data.EventMapLink); // Store map link from response
+          setMapLink(mapData.Data.EventMapLink); 
         } else {
-          setMapLink(null); // Handle case where no map link is returned
+          setMapLink(null); 
         }
       } catch (err) {
-        setMapLink(null); // Handle errors when fetching map link
+        setMapLink(null); 
       }
     };
 
@@ -103,7 +103,7 @@ const Schedule = ({ route }) => {
               <View style={styles.mapContainer}>
                 <TouchableOpacity
                   style={styles.mapButton}
-                  onPress={() => Linking.openURL(mapLink)} // Opens the map link in the browser or app
+                  onPress={() => Linking.openURL(mapLink)} 
                 >
                   <Text style={styles.mapButtonText}>View on Map</Text>
                 </TouchableOpacity>
@@ -127,21 +127,21 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 400, // Increased image size
+    height: 400, 
     resizeMode: 'cover',
-    borderRadius: 10, // Optional, if you want to add rounded corners to the image
+    borderRadius: 10,
   },
   locationImage: {
     width: '100%',
-    height: 200, // Adjust as needed
+    height: 200,
     resizeMode: 'cover',
-    marginTop: 15, // Add space between images
-    borderRadius: 10, // Optional for rounded corners
+    marginTop: 15,
+    borderRadius: 10,
   },
   detailsContainer: {
     padding: 20,
     marginTop: 10,
-    flex: 1, // Ensures it takes up the full available space
+    flex: 1, 
   },
   title: {
     fontSize: 24,
@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     marginTop: 20,
-    flexDirection: 'row', // This aligns the button horizontally if needed
-    justifyContent: 'center', // Centers the button
+    flexDirection: 'row', 
+    justifyContent: 'center', 
   },
   mapButton: {
     paddingVertical: 12,
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     width: "80%",
   },
   mapButtonText: {
-    color: 'white', // White text color
+    color: 'white', 
     fontSize: 16,
     fontWeight: '600',
   },
