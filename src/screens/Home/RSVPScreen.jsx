@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
 const RSVP = ({ route, navigation }) => {
-  const { eventUUID, UserId } = route.params; 
+  const { eventUUID, UserId } = route.params;
   const [response, setResponse] = useState(null);
+  const [travelDate, setTravelDate] = useState("");
+  const [isFormVisible, setIsFormVisible] = useState(false);
 
   console.log("Event UUID:", eventUUID);
-  console.log("User ID:", UserId);  
+  console.log("User ID:", UserId);
 
-  
   const handleSubmit = () => {
     if (!response) {
       Alert.alert("Incomplete", "Please select an option before submitting.");
@@ -25,6 +26,11 @@ const RSVP = ({ route, navigation }) => {
     console.log("Submitting RSVP with UserId:", UserId);
     console.log("EventUUID:", eventUUID);
     console.log("Response:", response);
+
+    if (response === "Happily Attending" && !travelDate) {
+      Alert.alert("Incomplete", "Please fill in your Travel Date.");
+      return;
+    }
 
     // Submit RSVP response
     fetch("https://guest-event-app.onrender.com/api/ComingornotStatus", {
@@ -42,12 +48,46 @@ const RSVP = ({ route, navigation }) => {
       .then((data) => {
         if (data.status_code === 200) {
           Alert.alert("Success", "Your response has been submitted.");
-          navigation.goBack(); // Navigate back to the previous screen
+
+          if (response === "Happily Attending") {
+            fetch("https://guest-event-app.onrender.com/api/UserProfileDatabyuuid", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                EventUUID: eventUUID, 
+                UserId: UserId,
+                TravelDate: travelDate, 
+              }),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.status_code === 200) {
+                  Alert.alert("Success", "Your profile has been updated.");
+                  navigation.goBack(); 
+                } else {
+                  Alert.alert("Error", data.message || "Failed to update profile.");
+                }
+              })
+              .catch((err) => Alert.alert("Error", "Profile update failed: " + err.message));
+          } else {
+            navigation.goBack();
+          }
         } else {
           Alert.alert("Error", data.message || "Failed to submit RSVP.");
         }
       })
       .catch((err) => Alert.alert("Error", "Submission failed: " + err.message));
+  };
+
+  const handleOptionSelect = (option) => {
+    setResponse(option);
+    if (option === "Happily Attending") {
+      setIsFormVisible(true); 
+    } else {
+      setIsFormVisible(false); 
+    }
   };
 
   return (
@@ -65,7 +105,7 @@ const RSVP = ({ route, navigation }) => {
               <TouchableOpacity
                 key={index}
                 style={styles.checkboxContainer}
-                onPress={() => setResponse(option)}
+                onPress={() => handleOptionSelect(option)}
               >
                 <View style={[styles.checkbox, response === option && styles.selectedCheckbox]}>
                   {response === option && <Text style={styles.checkboxText}>✓</Text>}
@@ -74,6 +114,18 @@ const RSVP = ({ route, navigation }) => {
               </TouchableOpacity>
             ))}
           </View>
+
+          {/* Form for Happily Attending */}
+          {isFormVisible && (
+            <View style={styles.form}>
+              <TextInput
+                style={styles.input}
+                placeholder="Travel Date (YYYY-MM-DD)"
+                value={travelDate}
+                onChangeText={setTravelDate}
+              />
+            </View>
+          )}
 
           {/* Submit Button */}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -152,6 +204,17 @@ const styles = StyleSheet.create({
   subheading: {
     fontSize: 16,
     color: "#555",
+  },
+  form: {
+    marginVertical: 20,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    width: "100%",
   },
   submitButton: {
     backgroundColor: "#C19264",

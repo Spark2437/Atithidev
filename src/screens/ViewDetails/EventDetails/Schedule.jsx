@@ -26,7 +26,7 @@ const Schedule = ({ route }) => {
         const data = await response.json();
         if (data.status_code === 200 && data.Data) {
           setSubEventDetails(data.Data[0]);
-          fetchEventMapLink(data.Data[0].EventUUID); // Fetch map link using eventUUID
+          fetchEventMapLink(data.Data[0].EventUUID); 
         } else {
           setError("No details found for this sub-event.");
         }

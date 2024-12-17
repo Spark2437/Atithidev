@@ -7,12 +7,12 @@ const SendHere = () => {
   const [paymentAmount, setPaymentAmount] = useState('');
 
   const handleSubmit = () => {
-    // Handle submission (e.g., send data to backend)
+ 
     console.log('Thoughts:', thoughts);
     console.log('Payment Amount:', paymentAmount);
   };
 
-  const flowerIcon = <Ionicons name="flower" size={24} color="#D08A76" />; // Flower icon from Ionicons
+  const flowerIcon = <Ionicons name="flower" size={24} color="#D08A76" />; 
   
   const renderFlowerIcons = () => {
     const icons = [];
@@ -22,10 +22,10 @@ const SendHere = () => {
           key={i}
           style={{
             position: 'absolute',
-            left: `${Math.random() * 100}%`, // Random horizontal position
-            top: `${Math.random() * 100}%`, // Random vertical position
-            opacity: 0.3 + Math.random() * 0.5, // Random opacity for subtle background effect
-            transform: [{ scale: 0.8 + Math.random() * 0.4 }], // Random scale for variety
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`, 
+            opacity: 0.3 + Math.random() * 0.5, 
+            transform: [{ scale: 0.8 + Math.random() * 0.4 }], 
           }}
         >
           {flowerIcon}
@@ -38,12 +38,12 @@ const SendHere = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        {/* Render flower icons in the background */}
+       
         <View style={styles.flowerIconsContainer}>{renderFlowerIcons()}</View>
 
         <Text style={styles.headerText}>Send your Blessings to the Bride and Groom.</Text>
         
-        {/* Text Input for writing thoughts with placeholder */}
+      
         <View style={styles.textInputContainer}>
           <TextInput
             style={styles.largeTextBox}
@@ -51,12 +51,12 @@ const SendHere = () => {
             value={thoughts}
             onChangeText={setThoughts}
             placeholder="Write your message here to send"
-            placeholderTextColor="transparent" // Hide the default placeholder
+            placeholderTextColor="transparent" 
           />
           {!thoughts && <Text style={styles.placeholderText}>Write your message here </Text>}
         </View>
         
-        {/* Button to submit thoughts */}
+    
         <View style={styles.buttonContainer}>
           <Button title="Share Your Thoughts" onPress={handleSubmit} color="#D08A76" />
         </View>
@@ -65,7 +65,7 @@ const SendHere = () => {
           Send Your Shagun ka Lifafa
         </Text>
         
-        {/* Button to submit payment */}
+      
         <View style={styles.buttonContainer}>
           <Button title="Pay Now" onPress={handleSubmit} color="#D08A76" />
         </View>
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 20,
-    backgroundColor: 'white', // Ensure white background for contrast
+    backgroundColor: 'white', 
   },
   scrollContainer: {
     flexGrow: 1,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: -1, // Place icons behind the content
+    zIndex: -1, 
   },
   headerText: {
     fontSize: 24,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   textInputContainer: {
-    width: '90%', // Ensure it has some padding and is not too wide
+    width: '90%', 
     height: 150,
     position: 'relative',
     marginBottom: 20,
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     fontSize: 16,
-    backgroundColor: 'white', // Ensure the background is white for text input
+    backgroundColor: 'white', 
   },
   placeholderText: {
     position: 'absolute',

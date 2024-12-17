@@ -32,7 +32,6 @@ const AllEvents = ({ navigation }) => {
   );
 
   const toggleProfile = () => {
-    console.log("Toggling profile visibility");
     if (!showProfile) {
       setShowProfile(true);
       Animated.timing(slideAnim, {
@@ -50,9 +49,7 @@ const AllEvents = ({ navigation }) => {
   };
 
   const fetchUserDetails = async () => {
-    console.log("Fetching user details");
     if (!UserId || !token) {
-      console.log("UserId or token is missing");
       return;
     }
 
@@ -71,8 +68,6 @@ const AllEvents = ({ navigation }) => {
       );
 
       const data = await response.json();
-      console.log("User details response:", data);
-
       if (data.status_code === 200) {
         const userData = data.Data[0];
         setProfileData({
@@ -85,14 +80,11 @@ const AllEvents = ({ navigation }) => {
       }
     } catch (err) {
       setError("Error fetching user details: " + err.message);
-      console.error("Error fetching user details:", err);
     }
   };
 
   const fetchEvents = async () => {
-    console.log("Fetching events");
     if (!UserId || !token) {
-      console.log("UserId or token is missing");
       return;
     }
 
@@ -111,8 +103,6 @@ const AllEvents = ({ navigation }) => {
       );
 
       const data = await response.json();
-      console.log("Events response:", data);
-
       if (data.status_code === 200) {
         setEvents(data.Data);
       } else {
@@ -120,20 +110,17 @@ const AllEvents = ({ navigation }) => {
       }
     } catch (err) {
       setError("Error fetching events: " + err.message);
-      console.error("Error fetching events:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    console.log("Fetching data on component mount or UserId/token change");
     fetchUserDetails();
     fetchEvents();
   }, [UserId, token]);
 
   const handleEventPress = (event) => {
-    console.log("Event pressed:", event.EventUUID);
     navigation.navigate("SplashScreenEvents", {
       eventUUID: event.EventUUID,
       UserId: UserId,
@@ -141,31 +128,55 @@ const AllEvents = ({ navigation }) => {
   };
 
   const handleLogout = async () => {
-    console.log("Logging out");
     try {
-      const response = await fetch("https://guest-event-app.onrender.com/api/Logoutbyuuid", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          UserId: UserId,
-        },
-        body: JSON.stringify({ UserId }),
-      });
+      const response = await fetch(
+        "https://guest-event-app.onrender.com/api/Logoutbyuuid",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            UserId: UserId,
+          },
+          body: JSON.stringify({ UserId }),
+        }
+      );
 
       const data = await response.json();
-      console.log("Logout response:", data);
-
       if (data.status_code === 200) {
         clearUserData();
-        console.log("User logged out, navigating to LoginScreen");
         navigation.replace("LoginScreen");
-      } else {
-        console.error(data.Remark || "Failed to log out.");
       }
     } catch (err) {
       console.error("Error logging out:", err);
     }
+  };
+
+  // Helper function to format date and time
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    
+    // Get day, month and year
+    const day = date.getDate();
+    const month = date.toLocaleString('default', { month: 'long' });
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    
+    // Add ordinal suffix for the day
+    const suffix = (day) => {
+      if (day >= 11 && day <= 13) return 'th';
+      switch (day % 10) {
+        case 1: return 'st';
+        case 2: return 'nd';
+        case 3: return 'rd';
+        default: return 'th';
+      }
+    };
+    
+    const formattedDay = `${day}${suffix(day)}`;
+    const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? '0' + minutes : minutes} ${hours < 12 ? 'am' : 'pm'}`;
+
+    return `${formattedDay} ${month} ${formattedTime}`;
   };
 
   return (
@@ -181,7 +192,15 @@ const AllEvents = ({ navigation }) => {
               <Icon name="user" size={16} color="#fff" />
             </View>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Notification", { eventUUID: "EventUUID", UserId: UserId })}
+          >
+            <View style={styles.iconContainer}>
+              <Icon name="bell" size={16} color="#fff" />
+            </View>
+          </TouchableOpacity>
         </View>
+
         <ScrollView contentContainerStyle={styles.eventList}>
           {loading ? (
             <Text style={styles.loadingText}>Loading events...</Text>
@@ -205,15 +224,16 @@ const AllEvents = ({ navigation }) => {
                     <Text style={styles.eventCoupleName}>
                       Couple: {event.CoupleName}
                     </Text>
-                    <Text style={styles.eventLocation}>{event.EventCity}</Text>
+                    <Text style={styles.eventLocation}>
+                    City: {event.EventCity}</Text>
                     <Text style={styles.eventVenue}>
                       Venue: {event.EventVenue}
                     </Text>
                     <Text style={styles.eventDate}>
-                      Starts: {new Date(event.EventStartDate).toLocaleString()}
+                      Starts: {formatDate(event.EventStartDate)}
                     </Text>
                     <Text style={styles.eventDate}>
-                      Ends: {new Date(event.EventEndDate).toLocaleString()}
+                      Ends: {formatDate(event.EventEndDate)}
                     </Text>
                   </View>
                 </View>
@@ -222,14 +242,10 @@ const AllEvents = ({ navigation }) => {
           )}
         </ScrollView>
 
-        {/* Profile Sidebar */}
         {showProfile && (
           <TouchableWithoutFeedback onPress={() => setShowProfile(false)}>
             <Animated.View
-              style={[
-                styles.profileSidebar,
-                { transform: [{ translateX: slideAnim }] },
-              ]}
+              style={[styles.profileSidebar, { transform: [{ translateX: slideAnim }] }]}
             >
               <View style={styles.profileContent}>
                 <View style={styles.profileTop}>
@@ -241,7 +257,9 @@ const AllEvents = ({ navigation }) => {
                     </View>
                   </TouchableOpacity>
                   <Text style={styles.username}>{profileData.username}</Text>
-                  <Text style={styles.mobileNumber}>{profileData.mobileNumber}</Text>
+                  <Text style={styles.mobileNumber}>
+                    {profileData.mobileNumber}
+                  </Text>
                 </View>
 
                 <View style={styles.profileLine}></View>
@@ -259,7 +277,7 @@ const AllEvents = ({ navigation }) => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={styles.buttonContainer}
-                    onPress={handleLogout} // Handle logout
+                    onPress={handleLogout}
                   >
                     <View style={styles.button}>
                       <Text style={styles.buttonText}>Logout</Text>
@@ -278,12 +296,14 @@ const AllEvents = ({ navigation }) => {
 const styles = StyleSheet.create({
   gradientContainer: { flex: 1 },
   header: {
+    flexDirection: "row",
     position: "absolute",
     left: 20,
     top: 40,
     zIndex: 1,
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "90%",
   },
   iconContainer: {
     width: 26,
@@ -292,6 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: "black",
     alignItems: "center",
     justifyContent: "center",
+    marginHorizontal: 10,
   },
   profileSidebar: {
     position: "absolute",
@@ -403,7 +424,7 @@ const styles = StyleSheet.create({
   },
   eventLocation: {
     fontSize: 14,
-    color: "#666",
+    color: "#444",
   },
   eventVenue: {
     fontSize: 14,

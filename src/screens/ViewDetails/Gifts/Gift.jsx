@@ -3,7 +3,7 @@ import { View, Text, ImageBackground, TouchableOpacity, StyleSheet } from 'react
 
 const Gift = ({ navigation }) => {
   const handlePress = () => {
-    // Navigate to the SendHere page when the button is pressed
+    
     navigation.navigate('SendHere');
   };
 
@@ -33,48 +33,48 @@ const Gift = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center', // Center the content vertically
-    alignItems: 'center', // Center the content horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   headerText: {
     color: 'white',
     fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 20, // Space between text and the image
-    zIndex: 1, // Ensure the header text stays on top
+    marginBottom: 20, 
+    zIndex: 1, 
   },
   backgroundImage: {
     width: '100%',
-    height: '100%', // Make the image cover the full screen
-    justifyContent: 'flex-start', // Align the content at the top
-    alignItems: 'center', // Center text horizontally within the image
+    height: '100%', 
+    justifyContent: 'flex-start',
+    alignItems: 'center', 
   },
   text: {
     color: 'white',
     fontSize: 24,
     fontWeight: 'bold',
-    position: 'absolute', // Position the text absolutely
-    top: 190, // Distance from the top of the screen
-    left: '50%', // Horizontally center the text
-    transform: [{ translateX: -150 }], // Adjust for text width
-    zIndex: 1, // Ensure the text stays on top
+    position: 'absolute', 
+    top: 190, 
+    left: '50%', 
+    transform: [{ translateX: -150 }], 
+    zIndex: 1, 
   },
   buttonContainer: {
-    position: 'absolute', // Position the button absolutely
-    bottom: 177, // Distance from the bottom
-    left: '50%', // Horizontally center the button
-    transform: [{ translateX: -55 }], // Adjust for button width
-    zIndex: 1, // Ensure the button stays on top
+    position: 'absolute',
+    bottom: 177, 
+    left: '50%', 
+    transform: [{ translateX: -55 }], 
+    zIndex: 1, 
   },
   button: {
-    backgroundColor: '#D08A76', // Set button background color
+    backgroundColor: '#D08A76',
     paddingVertical: 12,
     paddingHorizontal: 30,
-    borderRadius: 25, // Rounded corners for the button
+    borderRadius: 25, 
    marginRight: 20,
   },
   buttonText: {
-    color: 'white', // Set text color to white
+    color: 'white', 
     fontSize: 18,
     fontWeight: 'bold',
   },

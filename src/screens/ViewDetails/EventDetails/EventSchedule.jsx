@@ -4,15 +4,19 @@ import {
   Text,
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   Image,
   ActivityIndicator,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation } from "@react-navigation/native"; 
+import { useNavigation } from "@react-navigation/native";
+import Icon from "react-native-vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 
 const EventSchedule = ({ route }) => {
-  const { eventUUID } = route.params;
+  const { eventUUID, UserId } = route.params;
   const [eventSchedule, setEventSchedule] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -49,15 +53,100 @@ const EventSchedule = ({ route }) => {
     fetchEventSchedule();
   }, [eventUUID]);
 
+  const openCamera = async () => {
+    try {
+      console.log("Requesting camera permissions...");
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Camera permission is required to use this feature.");
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Image,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        console.log("Image captured:", result.assets[0].uri);
+
+        const formData = new FormData();
+        formData.append("EventUUID", eventUUID);
+        formData.append("UserId", UserId);
+
+        const uri = result.assets[0].uri;
+        const fileName = uri.split('/').pop();
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+
+        let mimeType;
+        switch (fileExtension) {
+          case 'jpg':
+          case 'jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case 'png':
+            mimeType = 'image/png';
+            break;
+          case 'gif':
+            mimeType = 'image/gif';
+            break;
+          case 'bmp':
+            mimeType = 'image/bmp';
+            break;
+          case 'webp':
+            mimeType = 'image/webp';
+            break;
+          default:
+            mimeType = 'application/octet-stream';
+            break;
+        }
+
+        formData.append("Image", {
+          uri: uri,
+          name: fileName,
+          type: mimeType,
+        });
+
+        console.log("FormData prepared:", formData);
+
+        fetch("https://guest-event-app.onrender.com/api/ImagebyUserInsert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Upload response:", data);
+            if (data.status_code === 200) {
+              Alert.alert("Success", "Image uploaded successfully!");
+              console.log("Uploaded Data:", data.Data);
+            } else {
+              Alert.alert("Error", data.message || "Failed to upload image.");
+              console.error("Upload error:", data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Upload error:", error);
+            Alert.alert("Error", "Something went wrong.");
+          });
+      } else {
+        console.log("Camera was closed without taking a photo.");
+      }
+    } catch (error) {
+      console.error("Error launching camera:", error);
+      Alert.alert("Error", "Unable to open the camera.");
+    }
+  };
+
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
       locations={[0.3, 0.9]}
       style={styles.gradientContainer}
     >
-      <SafeAreaView style={{ flex: 1 }}>
-      
-
+      <SafeAreaView style={styles.safeArea}>
         <ScrollView contentContainerStyle={styles.scheduleList}>
           {loading ? (
             <ActivityIndicator size="large" color="#D08A76" />
@@ -70,8 +159,8 @@ const EventSchedule = ({ route }) => {
                 style={styles.scheduleCard}
                 onTouchEnd={() => {
                   navigation.navigate("Schedule", {
-                    eventUUID: eventUUID, 
-                    subEventUUID: subEvent.SubEventUUID, 
+                    eventUUID: eventUUID,
+                    subEventUUID: subEvent.SubEventUUID,
                   });
                 }}
               >
@@ -91,12 +180,48 @@ const EventSchedule = ({ route }) => {
                   <Text style={styles.subEventLocation}>
                     Venue: {subEvent.Placeinvenue}
                   </Text>
-                
                 </View>
               </View>
             ))
           )}
         </ScrollView>
+
+        {/* Footer */}
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => {
+              console.log("Navigating to EventDetails with eventUUID:", eventUUID);
+              navigation.navigate("EventDetails", { eventUUID });
+            }}
+          >
+            <Icon name="home-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
+            <Icon name="camera-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => {
+              console.log("Navigating to MediaScreen with eventUUID and UserId:", eventUUID, UserId);
+              navigation.navigate("MediaScreen", { eventUUID, UserId });
+            }}
+          >
+            <Icon name="images-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => {
+              console.log("Navigating to Vendors with eventUUID:", eventUUID);
+              navigation.navigate("Vendors", { eventUUID });
+            }}
+          >
+            <Icon name="business-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     </LinearGradient>
   );
@@ -105,22 +230,15 @@ const EventSchedule = ({ route }) => {
 const styles = StyleSheet.create({
   gradientContainer: {
     flex: 1,
-    marginTop: 10,
+    
   },
-  headerContainer: {
-    width: "100%",
-    padding: 12,
-    backgroundColor: "#D08A76",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
+  safeArea: {
+    flex: 1,
+    paddingBottom: 30,  
   },
   scheduleList: {
-    paddingBottom: 16,
+    flexGrow: 1,
+    paddingBottom: 10,  
     paddingHorizontal: 10,
   },
   scheduleCard: {
@@ -129,38 +247,56 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     overflow: "hidden",
     elevation: 4,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between", 
   },
   subEventImage: {
     width: "100%",
     height: 200,
+    resizeMode: "cover",
   },
   scheduleDetails: {
+    flex: 1,
     padding: 12,
+    justifyContent: "space-between",
   },
   subEventTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 4,
+    flexWrap: "wrap",
   },
   subEventTime: {
     fontSize: 14,
     color: "#666",
     marginBottom: 4,
+    flexWrap: "wrap",
   },
   subEventLocation: {
     fontSize: 14,
     color: "#666",
     marginBottom: 8,
-  },
-  subEventDescription: {
-    fontSize: 14,
-    color: "#444",
+    flexWrap: "wrap",
   },
   errorText: {
     color: "red",
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#D08A76",
+    paddingVertical: 10,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
+  footerButton: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

@@ -6,13 +6,16 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import Icon from "react-native-vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 
 const Vendors = ({ route, navigation }) => {
   const [vendorsData, setVendorsData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { eventUUID } = route.params;
+  const { eventUUID, UserId } = route.params;
 
   useEffect(() => {
     const fetchVendorData = async () => {
@@ -77,6 +80,95 @@ const Vendors = ({ route, navigation }) => {
     </View>
   );
 
+
+  const openCamera = async () => {
+    try {
+      console.log("Requesting camera permissions...");
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Camera permission is required to use this feature.");
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Image,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        console.log("Image captured:", result.assets[0].uri);
+
+        const formData = new FormData();
+        formData.append("EventUUID", eventUUID);
+        formData.append("UserId", UserId);
+
+        const uri = result.assets[0].uri;
+        const fileName = uri.split("/").pop();
+        const fileExtension = fileName.split(".").pop().toLowerCase();
+
+        let mimeType;
+        switch (fileExtension) {
+          case "jpg":
+          case "jpeg":
+            mimeType = "image/jpeg";
+            break;
+          case "png":
+            mimeType = "image/png";
+            break;
+          case "gif":
+            mimeType = "image/gif";
+            break;
+          case "bmp":
+            mimeType = "image/bmp";
+            break;
+          case "webp":
+            mimeType = "image/webp";
+            break;
+          default:
+            mimeType = "application/octet-stream";
+            break;
+        }
+
+        formData.append("Image", {
+          uri: uri,
+          name: fileName,
+          type: mimeType,
+        });
+
+        setLoading(true);
+
+        fetch("https://guest-event-app.onrender.com/api/ImagebyUserInsert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setLoading(false);
+            console.log("Upload response:", data);
+            if (data.status_code === 200) {
+              Alert.alert("Success", "Image uploaded successfully!");
+            } else {
+              Alert.alert("Error", data.message || "Failed to upload image.");
+            }
+          })
+          .catch((error) => {
+            setLoading(false);
+            console.error("Upload error:", error);
+            Alert.alert("Error", "Something went wrong.");
+          });
+      } else {
+        console.log("Camera was closed without taking a photo.");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Error launching camera:", error);
+      Alert.alert("Error", "Unable to open the camera.");
+    }
+  };
+
   if (loading) {
     return (
       <LinearGradient
@@ -117,6 +209,40 @@ const Vendors = ({ route, navigation }) => {
         renderItem={renderVendorItem}
         keyExtractor={(category) => category.Category}
       />
+
+      {/* Footer with Camera Button */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => {
+            navigation.navigate("EventDetails", { eventUUID });
+          }}
+        >
+          <Icon name="home-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
+          <Icon name="camera-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => {
+            navigation.navigate("MediaScreen", { eventUUID, UserId });
+          }}
+        >
+          <Icon name="images-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => {
+            navigation.navigate("Vendors", { eventUUID });
+          }}
+        >
+          <Icon name="business-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
   );
 };
@@ -138,7 +264,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
     color: "#333",
-   
   },
   card: {
     flexDirection: "row",
@@ -180,6 +305,15 @@ const styles = StyleSheet.create({
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
+    alignItems: "center",
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#D08A76",
+    paddingVertical: 10,
+  },
+  footerButton: {
     alignItems: "center",
   },
 });

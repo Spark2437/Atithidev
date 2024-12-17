@@ -1,15 +1,16 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import Icon from "react-native-vector-icons/Ionicons";
+import * as ImagePicker from "expo-image-picker";
 
 const Travel = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { eventUUID } = route.params || {};
+  const { eventUUID, UserId } = route.params || {};
 
-  console.log("Travel Screen Loaded");
-  console.log("Received eventUUID:", eventUUID);
+  const [loading, setLoading] = useState(false);
 
   const details = [
     {
@@ -30,8 +31,98 @@ const Travel = () => {
 
   const handleCardPress = (item) => {
     console.log("Card Pressed:", item);
-    console.log("Navigating to TravelDetails with cardType:", item.cardType);
     navigation.navigate("TravelDetails", { eventUUID, cardType: item.cardType });
+  };
+
+  const openCamera = async () => {
+    try {
+      console.log("Requesting camera permissions...");
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission Denied", "Camera permission is required to use this feature.");
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Image,
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        console.log("Image captured:", result.assets[0].uri);
+
+        const formData = new FormData();
+        formData.append("EventUUID", eventUUID);
+        formData.append("UserId", UserId);
+
+        const uri = result.assets[0].uri;
+        const fileName = uri.split('/').pop();
+        const fileExtension = fileName.split('.').pop().toLowerCase();
+
+        let mimeType;
+        switch (fileExtension) {
+          case 'jpg':
+          case 'jpeg':
+            mimeType = 'image/jpeg';
+            break;
+          case 'png':
+            mimeType = 'image/png';
+            break;
+          case 'gif':
+            mimeType = 'image/gif';
+            break;
+          case 'bmp':
+            mimeType = 'image/bmp';
+            break;
+          case 'webp':
+            mimeType = 'image/webp';
+            break;
+          default:
+            mimeType = 'application/octet-stream';
+            break;
+        }
+
+        formData.append("Image", {
+          uri: uri,
+          name: fileName,
+          type: mimeType,
+        });
+
+        console.log("FormData prepared:", formData);
+
+        setLoading(true);
+
+        fetch("https://guest-event-app.onrender.com/api/ImagebyUserInsert", {
+          method: "POST",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setLoading(false);
+            console.log("Upload response:", data);
+            if (data.status_code === 200) {
+              Alert.alert("Success", "Image uploaded successfully!");
+            } else {
+              Alert.alert("Error", data.message || "Failed to upload image.");
+              console.error("Upload error:", data.message);
+            }
+          })
+          .catch((error) => {
+            setLoading(false);
+            console.error("Upload error:", error);
+            Alert.alert("Error", "Something went wrong.");
+          });
+      } else {
+        console.log("Camera was closed without taking a photo.");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Error launching camera:", error);
+      Alert.alert("Error", "Unable to open the camera.");
+    }
   };
 
   return (
@@ -42,7 +133,6 @@ const Travel = () => {
     >
       <ScrollView>
         {details.map((item, index) => {
-          console.log("Rendering card:", item.title);
           return (
             <TouchableOpacity key={index} onPress={() => handleCardPress(item)}>
               <View style={styles.card}>
@@ -57,6 +147,40 @@ const Travel = () => {
           );
         })}
       </ScrollView>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => {
+            navigation.navigate("EventDetails", { eventUUID });
+          }}
+        >
+          <Icon name="home-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
+          <Icon name="camera-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => {
+            navigation.navigate("MediaScreen", { eventUUID, UserId });
+          }}
+        >
+          <Icon name="images-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.footerButton}
+          onPress={() => {
+            navigation.navigate("Vendors", { eventUUID });
+          }}
+        >
+          <Icon name="business-outline" size={24} color="#FFF" />
+        </TouchableOpacity>
+      </View>
     </LinearGradient>
   );
 };
@@ -65,41 +189,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    marginTop: 20,
+   
+    justifyContent: "flex-start", 
   },
   card: {
+    flexDirection: "column", 
     backgroundColor: "white",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
+    marginTop: 20,
     marginVertical: 10,
     overflow: "hidden",
+    alignItems: "stretch", 
   },
   image: {
-    width: "100%",
+    width: "100%", 
     height: 150,
-    resizeMode: "cover",
+    resizeMode: "cover", 
   },
   textContainer: {
+    flex: 1, 
     padding: 15,
-    marginTop: -10,
+    justifyContent: "center", 
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#333",
+    marginBottom: 5,
   },
   description: {
     fontSize: 14,
     color: "#555",
-    marginVertical: 1,
+    marginVertical: 2,
   },
   amenities: {
     fontSize: 14,
     color: "#555",
-    marginVertical: 1,
+    marginVertical: 2,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-around", 
+    backgroundColor: "#D08A76",
+    paddingVertical: 10,
+    position: "absolute", 
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  footerButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
   },
 });
 

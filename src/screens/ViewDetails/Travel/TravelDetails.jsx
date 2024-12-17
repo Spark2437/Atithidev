@@ -174,7 +174,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    marginTop: 20, 
   },
   travelContainer: {
     marginVertical: 16,

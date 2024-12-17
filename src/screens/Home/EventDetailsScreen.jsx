@@ -7,6 +7,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -14,17 +16,20 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 
 const EventDetails = ({ route, navigation }) => {
-  const { eventUUID, UserId } = route.params;  
+  const { eventUUID, UserId } = route.params;
 
   const [eventDetails, setEventDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [circleImage, setCircleImage] = useState(null);
+  const [profileData, setProfileData] = useState(null);
+  const [isProfileModalVisible, setProfileModalVisible] = useState(false);
 
   useEffect(() => {
     console.log("Fetching event details for EventUUID:", eventUUID);
 
-    fetch("https://guest-event-app.onrender.com/api/eventdetailsbyuuid", { 
+    // Fetch event details
+    fetch("https://guest-event-app.onrender.com/api/eventdetailsbyuuid", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -33,7 +38,7 @@ const EventDetails = ({ route, navigation }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log("Received data:", data);
+        console.log("Received event data:", data);
         if (data.status_code === 200 && data.Data.length > 0) {
           setEventDetails(data.Data[0]);
         } else {
@@ -47,6 +52,7 @@ const EventDetails = ({ route, navigation }) => {
       })
       .finally(() => setLoading(false));
 
+    // Fetch circle image
     fetch("https://guest-event-app.onrender.com/api/StoryMainIcon", {
       method: "POST",
       headers: {
@@ -65,10 +71,32 @@ const EventDetails = ({ route, navigation }) => {
       .catch((err) => {
         console.error("Error fetching circle image:", err);
       });
+
+    // Fetch profile data
+    fetchProfileData();
   }, [eventUUID]);
 
-  if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
-  if (error) return <Text style={styles.errorText}>{error}</Text>;
+  const fetchProfileData = () => {
+    fetch("https://guest-event-app.onrender.com/api/UserComingDetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ UserId: UserId, EventUUID: eventUUID }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status_code === 200) {
+          setProfileData(data.Data);
+        } else {
+          Alert.alert("Error", "Failed to fetch profile data.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching profile data:", error);
+        Alert.alert("Error", "Unable to fetch profile data.");
+      });
+  };
 
   const openCamera = async () => {
     try {
@@ -89,7 +117,7 @@ const EventDetails = ({ route, navigation }) => {
 
         const formData = new FormData();
         formData.append("EventUUID", eventUUID);
-        formData.append("UserId", UserId); 
+        formData.append("UserId", UserId);
 
         const uri = result.assets[0].uri;
         const fileName = uri.split('/').pop();
@@ -129,7 +157,7 @@ const EventDetails = ({ route, navigation }) => {
         fetch("https://guest-event-app.onrender.com/api/ImagebyUserInsert", {
           method: "POST",
           headers: {
-            "Content-Type": "multipart/form-data", 
+            "Content-Type": "multipart/form-data",
           },
           body: formData,
         })
@@ -156,6 +184,13 @@ const EventDetails = ({ route, navigation }) => {
       Alert.alert("Error", "Unable to open the camera.");
     }
   };
+
+  const toggleProfileModal = () => {
+    setProfileModalVisible(!isProfileModalVisible);
+  };
+
+  if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
+  if (error) return <Text style={styles.errorText}>{error}</Text>;
 
   return (
     <LinearGradient
@@ -231,9 +266,10 @@ const EventDetails = ({ route, navigation }) => {
               <TouchableOpacity
                 style={styles.ViewDetails}
                 onPress={() => {
-                  console.log("Navigating to ViewDetails with eventUUID:", eventDetails?.EventUUID);
+                  console.log("Navigating to ViewDetails with eventUUID:", eventDetails?.EventUUID, "and UserId:", UserId);
                   navigation.navigate("ViewDetails", {
                     eventUUID: eventDetails?.EventUUID,
+                    UserId: UserId,
                   });
                 }}
               >
@@ -243,9 +279,10 @@ const EventDetails = ({ route, navigation }) => {
               <TouchableOpacity
                 style={styles.ViewDetails}
                 onPress={() => {
-                  console.log("Navigating to NextEvent with eventUUID:", eventDetails?.EventUUID);
+                  console.log("Navigating to NextEvent with eventUUID:", eventDetails?.EventUUID, "and UserId:", UserId);
                   navigation.navigate("NextEvent", {
                     eventUUID: eventDetails?.EventUUID,
+                    UserId: UserId,
                   });
                 }}
               >
@@ -255,9 +292,20 @@ const EventDetails = ({ route, navigation }) => {
           </ScrollView>
 
           <View style={styles.footer}>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => {
+                console.log("Navigating to EventDetails with eventUUID:", eventUUID);
+                navigation.navigate("EventDetails", { eventUUID });
+              }}
+            >
+              <Icon name="home-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
               <Icon name="camera-outline" size={24} color="#FFF" />
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.footerButton}
               onPress={() => {
@@ -267,18 +315,49 @@ const EventDetails = ({ route, navigation }) => {
             >
               <Icon name="images-outline" size={24} color="#FFF" />
             </TouchableOpacity>
+
             <TouchableOpacity
               style={styles.footerButton}
               onPress={() => {
                 console.log("Navigating to Vendors with eventUUID:", eventUUID);
-                navigation.navigate("Vendors", { eventUUID });
+                navigation.navigate("Vendors", { eventUUID, UserId });
               }}
             >
               <Icon name="business-outline" size={24} color="#FFF" />
             </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={toggleProfileModal}
+            >
+              <Icon name="person-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
           </View>
         </View>
       </SafeAreaView>
+
+      {/* Profile Modal */}
+      <Modal
+        visible={isProfileModalVisible}
+        animationType="slide"
+        onRequestClose={toggleProfileModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {profileData ? (
+              <>  
+                <Text style={styles.profileDetails}>Status: {profileData.Status}</Text>
+                <Text style={styles.profileDetails}>Travel Date: {profileData.TravelDate}</Text>
+              </>
+            ) : (
+              <ActivityIndicator size="large" color="#D08A76" />
+            )}
+            <TouchableOpacity style={styles.closeButton} onPress={toggleProfileModal}>
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </LinearGradient>
   );
 };
@@ -296,7 +375,7 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 10,
     overflow: "hidden",
-    position: "relative", 
+    position: "relative",
   },
 
   eventImage: {
@@ -304,7 +383,7 @@ const styles = StyleSheet.create({
     height: "100%",
     resizeMode: "cover",
   },
-  
+
   eventName: {
     fontSize: 24,
     fontWeight: "bold",
@@ -365,19 +444,57 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 5,
     right: 5,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 70, 
+    height: 70, 
+    borderRadius: 35, 
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 3, 
+    borderColor: "#ff4500",
+    backgroundColor: "#000", 
     zIndex: 10,
   },
-
+  
   circleImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 30,
+    borderRadius: 35, 
     resizeMode: "cover",
+  },
+  
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+   backgroundColor: "rgba(232, 198, 188, 0.8)",
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  profileTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  profileDetails: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  closeButton: {
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: "#D08A76",
+    borderRadius: 10,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#fff",
   },
 });
 

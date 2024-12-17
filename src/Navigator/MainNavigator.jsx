@@ -1,6 +1,7 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import AllEvents from "../screens/Home/AllEvents";
+import Notification from "../screens/Home/Notification";
 import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
 import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
 import OurStory from "../screens/Home/OurStory";
@@ -38,6 +39,13 @@ const MainNavigator = () => (
       component={AllEvents}
       options={{ headerShown: false }}
     />
+
+    <Stack.Screen
+      name="Notification"
+      component={Notification}
+      options={{ headerShown: false }}
+    />
+
     <Stack.Screen
       name="SplashScreenEvents"
       component={SplashScreenEvents}
@@ -49,11 +57,12 @@ const MainNavigator = () => (
       options={{ headerShown: false }}
     />
 
-<Stack.Screen
+    <Stack.Screen
       name="OurStory"
       component={OurStory}
       options={{ headerShown: false }}
     />
+
 
     <Stack.Screen
       name="ViewDetails"
