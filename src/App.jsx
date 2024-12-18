@@ -1,16 +1,15 @@
-import React, { useEffect, Suspense } from "react";
+import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { UserProvider, useUserContext } from "./contexts/UserContext"; 
+import AuthNavigator from "./Navigator/AuthNavigator";
+import MainNavigator from "./Navigator/MainNavigator";
+import { StatusBar } from 'expo-status-bar'; 
 import * as Updates from 'expo-updates';
-import { Alert, Text } from 'react-native';
-
-
-const AuthNavigator = React.lazy(() => import("./Navigator/AuthNavigator"));
+import { Alert } from 'react-native';
 
 const App = () => {
   const { UserId, token } = useUserContext(); 
   const isAuthenticated = UserId && token;
-
   console.log("UserId:", UserId); 
   console.log("Token:", token);   
   console.log("IsAuthenticated:", isAuthenticated); 
@@ -42,9 +41,8 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Suspense fallback={<Text>Loading...</Text>}>
-        <AuthNavigator />
-      </Suspense>
+      <StatusBar translucent={true} backgroundColor="transparent" style="dark" />
+      {isAuthenticated ? <MainNavigator /> : <AuthNavigator />} 
     </NavigationContainer>
   );
 };

@@ -1,8 +1,7 @@
 import React, { Suspense } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import LoginScreen from "../screens/Auth/LoginScreen"; // Not lazy loaded
-import OTPScreen from "../screens/Auth/OTPScreen"; // Not lazy loaded
-import MainNavigator from "./MainNavigator"; // This will be lazy loaded
+import LoginScreen from "../screens/Auth/LoginScreen"; 
+import OTPScreen from "../screens/Auth/OTPScreen"; 
 
 const Stack = createStackNavigator();
 
