@@ -1,19 +1,14 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import LoginScreen from "../screens/Auth/LoginScreen";
-import OTPScreen from "../screens/Auth/OTPScreen";
-import MainNavigator from "./MainNavigator"; 
-import { useUserContext } from "../contexts/UserContext"; 
+import LoginScreen from "../screens/Auth/LoginScreen"; // Not lazy loaded
+import OTPScreen from "../screens/Auth/OTPScreen"; // Not lazy loaded
+import MainNavigator from "./MainNavigator"; // This will be lazy loaded
 
 const Stack = createStackNavigator();
 
 const AuthNavigator = () => {
-  const { UserId, token } = useUserContext();
-
-  const isAuthenticated = UserId && token;
-
   return (
-    <Stack.Navigator initialRouteName={isAuthenticated ? 'Main' : 'LoginScreen'}>
+    <Stack.Navigator initialRouteName="LoginScreen">
       <Stack.Screen
         name="LoginScreen"
         component={LoginScreen}
@@ -26,7 +21,7 @@ const AuthNavigator = () => {
       />
       <Stack.Screen 
         name="Main" 
-        component={MainNavigator} 
+        component={React.lazy(() => import("./MainNavigator"))} 
         options={{ headerShown: false }} 
       />
     </Stack.Navigator>

@@ -84,9 +84,18 @@ const Schedule = ({ route }) => {
             {/* Event Name */}
             <Text style={styles.title}>{subEventDetails.EventName}</Text>
 
-            {/* Event Date */}
+            {/* Event Date and Time */}
             <Text style={styles.date}>
-              Date: {new Date(subEventDetails.DateandTime).toLocaleDateString()}
+              {new Date(subEventDetails.DateandTime).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "long", 
+              })} 
+              {" "} 
+              {new Date(subEventDetails.DateandTime).toLocaleString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+              })}
             </Text>
 
             {/* Sub-event Description */}
@@ -96,7 +105,7 @@ const Schedule = ({ route }) => {
             <Image source={{ uri: subEventDetails.LocationImage }} style={styles.locationImage} />
 
             {/* Event Location */}
-            <Text style={styles.location}>Location: {subEventDetails.Placeinvenue}</Text>
+            <Text style={styles.location}>Venue: {subEventDetails.Placeinvenue}</Text>
 
             {/* Displaying Map Link */}
             {mapLink && (
@@ -165,7 +174,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   mapContainer: {
-    marginTop: 20,
+
     flexDirection: 'row', 
     justifyContent: 'center', 
   },
@@ -175,7 +184,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#D08A76",
     borderRadius: 8,
     alignItems: "center",
-    width: "80%",
+    width: "100%",
   },
   mapButtonText: {
     color: 'white', 

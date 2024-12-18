@@ -212,37 +212,51 @@ const Vendors = ({ route, navigation }) => {
 
       {/* Footer with Camera Button */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => {
-            navigation.navigate("EventDetails", { eventUUID });
-          }}
-        >
-          <Icon name="home-outline" size={24} color="#FFF" />
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => {
+                console.log("Navigating to EventDetails with eventUUID:", eventUUID);
+                navigation.navigate("EventDetails", { eventUUID, UserId });
+              }}
+            >
+              <Icon name="home-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
-          <Icon name="camera-outline" size={24} color="#FFF" />
-        </TouchableOpacity>
+            <TouchableOpacity style={styles.footerButton} onPress={openCamera}>
+              <Icon name="camera-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => {
-            navigation.navigate("MediaScreen", { eventUUID, UserId });
-          }}
-        >
-          <Icon name="images-outline" size={24} color="#FFF" />
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => {
+                console.log("Navigating to MediaScreen with eventUUID and UserId:", eventUUID, UserId);
+                navigation.navigate("MediaScreen", { eventUUID, UserId });
+              }}
+            >
+              <Icon name="images-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.footerButton}
-          onPress={() => {
-            navigation.navigate("Vendors", { eventUUID });
-          }}
-        >
-          <Icon name="business-outline" size={24} color="#FFF" />
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => {
+                console.log("Navigating to Vendors with eventUUID:", eventUUID);
+                navigation.navigate("Vendors", { eventUUID, UserId });
+              }}
+            >
+              <Icon name="business-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.footerButton}
+              onPress={() => {
+                console.log("Navigating to ProfileScreen with eventUUID and UserId:", eventUUID, UserId);
+                navigation.navigate("ProfileScreen", { UserId, eventUUID });
+              }}
+            >
+              <Icon name="person-outline" size={24} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+
     </LinearGradient>
   );
 };

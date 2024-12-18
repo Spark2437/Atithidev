@@ -8,10 +8,10 @@ import {
   TouchableOpacity,
   Linking,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient"; 
+import { LinearGradient } from "expo-linear-gradient";
 
 const NextEvent = ({ route, navigation }) => {
-  const { eventUUID } = route.params; 
+  const { eventUUID } = route.params;
   const [nextEvent, setNextEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,12 +22,12 @@ const NextEvent = ({ route, navigation }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ EventUUID: eventUUID }), 
+      body: JSON.stringify({ EventUUID: eventUUID }),
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.status_code === 200 && data.Data.length > 0) {
-          setNextEvent(data.Data[0]); 
+          setNextEvent(data.Data[0]);
         } else {
           setError("Failed to fetch next event details.");
         }
@@ -46,30 +46,32 @@ const NextEvent = ({ route, navigation }) => {
     Linking.openURL(nextEvent?.MapLink);
   };
 
+  const formattedDateTime = new Date(nextEvent?.DateandTime).toLocaleString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true, 
+  });
+
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
       locations={[0.3, 0.9]}
-      style={styles.gradientContainer}
+      style={styles.container}
     >
-      <ScrollView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         {nextEvent?.Image && (
           <Image source={{ uri: nextEvent.Image }} style={styles.image} />
         )}
-        <View style={styles.textContainer}>
+        <View style={styles.detailsContainer}>
           <Text style={styles.title}>{nextEvent?.EventName}</Text>
-          <Text style={styles.date}>
-            Date: {new Date(nextEvent?.DateandTime).toLocaleDateString()}
-          </Text>
-          <Text style={styles.time}>
-            Time: {new Date(nextEvent?.DateandTime).toLocaleTimeString()}
-          </Text>
+          <Text style={styles.dateTime}>{formattedDateTime}</Text>
           <Text style={styles.shortDescription}>
             {nextEvent?.ShortDescription}
           </Text>
         </View>
 
-        {/* Display Location Image */}
         {nextEvent?.LocationImage && (
           <Image
             source={{ uri: nextEvent.LocationImage }}
@@ -77,12 +79,10 @@ const NextEvent = ({ route, navigation }) => {
           />
         )}
 
-        {/* Display Location below the Location Image */}
-        <Text style={styles.location}>Location: {nextEvent?.Placeinvenue}</Text>
+        <Text style={styles.location}>Venue: {nextEvent?.Placeinvenue}</Text>
 
-        {/* Map Link */}
         <TouchableOpacity style={styles.mapButton} onPress={handleMapLink}>
-          <Text style={styles.buttonText}>View Location on Map</Text>
+          <Text style={styles.mapButtonText}>View Location on Map</Text>
         </TouchableOpacity>
       </ScrollView>
     </LinearGradient>
@@ -90,58 +90,62 @@ const NextEvent = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  gradientContainer: {
-    flex: 1,
-  },
   container: {
     flex: 1,
-    padding: 10,
-    marginTop: 40,
+    padding: 15,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    padding: 0,
   },
   image: {
     width: "100%",
-    height: 200,
+    height: 400,
     resizeMode: "cover",
+    borderRadius: 10,
+    marginTop: 15,
   },
   locationImage: {
     width: "100%",
     height: 200,
     resizeMode: "cover",
-
+    marginTop: 15,
+    borderRadius: 10,
   },
-  textContainer: {
-    padding: 15,
-    marginTop: -10,
+  detailsContainer: {
+    marginTop: 10,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
-  },
-  shortDescription: {
-    fontSize: 14,
     color: "black",
-   
   },
-  date: {
-    fontSize: 14,
+  dateTime: {
+    fontSize: 16,
     color: "black",
-    marginVertical: 1,
-  },
-  time: {
-    fontSize: 14,
-    color: "black",
-    marginVertical: 1,
   },
   location: {
-    fontSize: 14,
-    color: "black",
-    marginVertical: 1,
-  },
-  buttonText: {
     fontSize: 16,
-    color: "white",
-    fontWeight: "600",
+    marginBottom: 5,
+    color: "black",
+  },
+  shortDescription: {
+    fontSize: 16,
+    marginTop: 10,
+    color: "black",
+  },
+  mapButton: {
+    paddingVertical: 12,
+    marginBottom: 10,
+    backgroundColor: "#D08A76",
+    borderRadius: 8,
+    alignItems: "center",
+    width: "100%",
+  },
+  mapButtonText: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#FFF",
   },
   loadingText: {
     textAlign: "center",
@@ -150,14 +154,6 @@ const styles = StyleSheet.create({
   errorText: {
     textAlign: "center",
     color: "red",
-  },
-  mapButton: {
-    marginTop: 20,
-    backgroundColor: "#D08A76",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    alignItems: "center",
   },
 });
 

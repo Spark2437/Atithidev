@@ -170,11 +170,17 @@ const EventSchedule = ({ route }) => {
                 />
                 <View style={styles.scheduleDetails}>
                   <Text style={styles.subEventTitle}>{subEvent.EventName}</Text>
+                  <Text style={styles.subEventDate}>
+                    {new Date(subEvent.DateandTime).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "long",
+                    })}
+                  </Text>
                   <Text style={styles.subEventTime}>
-                    {new Date(subEvent.DateandTime).toLocaleString("en-US", {
-                      weekday: "long",
+                    {new Date(subEvent.DateandTime).toLocaleString("en-US",{
                       hour: "2-digit",
                       minute: "2-digit",
+                      hour12: true,
                     })}
                   </Text>
                   <Text style={styles.subEventLocation}>
@@ -192,7 +198,7 @@ const EventSchedule = ({ route }) => {
             style={styles.footerButton}
             onPress={() => {
               console.log("Navigating to EventDetails with eventUUID:", eventUUID);
-              navigation.navigate("EventDetails", { eventUUID });
+              navigation.navigate("EventDetails", { eventUUID, UserId });
             }}
           >
             <Icon name="home-outline" size={24} color="#FFF" />
@@ -216,10 +222,20 @@ const EventSchedule = ({ route }) => {
             style={styles.footerButton}
             onPress={() => {
               console.log("Navigating to Vendors with eventUUID:", eventUUID);
-              navigation.navigate("Vendors", { eventUUID });
+              navigation.navigate("Vendors", { eventUUID, UserId });
             }}
           >
             <Icon name="business-outline" size={24} color="#FFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => {
+              console.log("Navigating to ProfileScreen with eventUUID and UserId:", eventUUID, UserId);
+              navigation.navigate("ProfileScreen", { UserId, eventUUID });
+            }}
+          >
+            <Icon name="person-outline" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -230,15 +246,14 @@ const EventSchedule = ({ route }) => {
 const styles = StyleSheet.create({
   gradientContainer: {
     flex: 1,
-    
   },
   safeArea: {
     flex: 1,
-    paddingBottom: 30,  
+    paddingBottom: 30,
   },
   scheduleList: {
     flexGrow: 1,
-    paddingBottom: 10,  
+    paddingBottom: 10,
     paddingHorizontal: 10,
   },
   scheduleCard: {
@@ -249,7 +264,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between", 
+    justifyContent: "space-between",
   },
   subEventImage: {
     width: "100%",
@@ -267,20 +282,23 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     flexWrap: "wrap",
   },
+  subEventDate: {
+    fontSize: 14,
+    color: "black",
+    marginBottom: 4,
+  },
   subEventTime: {
     fontSize: 14,
-    color: "#666",
+    color: "black",
     marginBottom: 4,
-    flexWrap: "wrap",
   },
   subEventLocation: {
     fontSize: 14,
-    color: "#666",
+    color: "black",
     marginBottom: 8,
-    flexWrap: "wrap",
   },
   errorText: {
-    color: "red",
+    color: "black",
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,

@@ -155,30 +155,36 @@ const AllEvents = ({ navigation }) => {
   // Helper function to format date and time
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    
-    // Get day, month and year
+  
+    // Get day, month, and year
     const day = date.getDate();
-    const month = date.toLocaleString('default', { month: 'long' });
+    const month = date.toLocaleString("default", { month: "long" });
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    
+  
     // Add ordinal suffix for the day
     const suffix = (day) => {
-      if (day >= 11 && day <= 13) return 'th';
+      if (day >= 11 && day <= 13) return "th";
       switch (day % 10) {
-        case 1: return 'st';
-        case 2: return 'nd';
-        case 3: return 'rd';
-        default: return 'th';
+        case 1:
+          return "st";
+        case 2:
+          return "nd";
+        case 3:
+          return "rd";
+        default:
+          return "th";
       }
     };
-    
+  
     const formattedDay = `${day}${suffix(day)}`;
-    const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? '0' + minutes : minutes} ${hours < 12 ? 'am' : 'pm'}`;
-
-    return `${formattedDay} ${month} ${formattedTime}`;
+    const formattedTime = `${hours % 12 || 12}:${
+      minutes < 10 ? "0" + minutes : minutes
+    } ${hours < 12 ? "am" : "pm"}`;
+  
+    return `${formattedDay} ${month}\n${formattedTime}`;
   };
-
+  
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
@@ -225,15 +231,12 @@ const AllEvents = ({ navigation }) => {
                       Couple: {event.CoupleName}
                     </Text>
                     <Text style={styles.eventLocation}>
-                    City: {event.EventCity}</Text>
+                      City: {event.EventCity}</Text>
                     <Text style={styles.eventVenue}>
                       Venue: {event.EventVenue}
                     </Text>
                     <Text style={styles.eventDate}>
-                      Starts: {formatDate(event.EventStartDate)}
-                    </Text>
-                    <Text style={styles.eventDate}>
-                      Ends: {formatDate(event.EventEndDate)}
+                      {formatDate(event.EventStartDate)}
                     </Text>
                   </View>
                 </View>
@@ -438,7 +441,7 @@ const styles = StyleSheet.create({
   },
   eventDate: {
     fontSize: 12,
-    color: "#777",
+    color: "#444",
     marginTop: 2,
   },
   loadingText: {

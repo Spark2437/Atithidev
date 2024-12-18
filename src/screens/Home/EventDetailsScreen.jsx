@@ -17,13 +17,13 @@ import * as ImagePicker from "expo-image-picker";
 
 const EventDetails = ({ route, navigation }) => {
   const { eventUUID, UserId } = route.params;
-
   const [eventDetails, setEventDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [circleImage, setCircleImage] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [isProfileModalVisible, setProfileModalVisible] = useState(false);
+  const [username, setUsername] = useState("");
 
   useEffect(() => {
     console.log("Fetching event details for EventUUID:", eventUUID);
@@ -74,6 +74,7 @@ const EventDetails = ({ route, navigation }) => {
 
     // Fetch profile data
     fetchProfileData();
+    setusername();
   }, [eventUUID]);
 
   const fetchProfileData = () => {
@@ -97,6 +98,28 @@ const EventDetails = ({ route, navigation }) => {
         Alert.alert("Error", "Unable to fetch profile data.");
       });
   };
+
+  const setusername = () => {
+    fetch("https://guest-event-app.onrender.com/api/Userdetailsbyuuid", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ UserId: UserId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status_code === 200 && data.Data.length > 0) {
+          setUsername(data.Data[0].Username); // Set the username
+        } else {
+          console.error("Error fetching username:", data.message);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching username:", err);
+      });
+  };
+
 
   const openCamera = async () => {
     try {
@@ -207,22 +230,23 @@ const EventDetails = ({ route, navigation }) => {
                   style={styles.eventImage}
                 />
 
-                {circleImage && (
-                  <TouchableOpacity
-                    style={styles.circleButton}
-                    onPress={() => {
-                      console.log("Navigating to OurStory with eventUUID:", eventUUID);
-                      navigation.navigate("OurStory", { eventUUID });
-                    }}
-                  >
-                    <Image source={{ uri: circleImage }} style={styles.circleImage} />
-                  </TouchableOpacity>
-                )}
+
               </View>
             )}
             <Text style={styles.eventName}>{eventDetails?.CoupleName}</Text>
 
             <View style={styles.detailsContainer}>
+              {circleImage && (
+                <TouchableOpacity
+                  style={styles.circleButton}
+                  onPress={() => {
+                    console.log("Navigating to OurStory with eventUUID:", eventUUID);
+                    navigation.navigate("OurStory", { eventUUID });
+                  }}
+                >
+                  <Image source={{ uri: circleImage }} style={styles.circleImage} />
+                </TouchableOpacity>
+              )}
               <View style={styles.eventDetailsContainer}>
                 <Text style={styles.eventDetails}>
                   <Text style={styles.boldText}>Location:</Text> {eventDetails?.EventCity}
@@ -231,13 +255,14 @@ const EventDetails = ({ route, navigation }) => {
                   <Text style={styles.boldText}>Venue:</Text> {eventDetails?.EventVenue}
                 </Text>
                 <Text style={styles.eventDetails}>
-                  <Text style={styles.boldText}>Start Date:</Text>{" "}
-                  {new Date(eventDetails?.EventStartDate).toLocaleDateString()}
+                  <Text style={styles.boldText}>Date:</Text>
+                  {new Date(eventDetails?.EventStartDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long' })}
                 </Text>
                 <Text style={styles.eventDetails}>
-                  <Text style={styles.boldText}>End Date:</Text>{" "}
-                  {new Date(eventDetails?.EventEndDate).toLocaleDateString()}
+                  <Text style={styles.boldText}>Time:</Text>
+                  {new Date(eventDetails?.EventStartDate).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: true })}
                 </Text>
+
                 <Text style={styles.eventDetails}>
                   <Text style={styles.boldText}>Organizer:</Text>{" "}
                   {eventDetails?.EventOrganizer}
@@ -258,9 +283,41 @@ const EventDetails = ({ route, navigation }) => {
               <Text style={styles.buttonText}>RSVP</Text>
             </TouchableOpacity>
 
-            <View style={styles.eventDescriptionContainer}>
-              <Text style={styles.eventDescription}>{eventDetails?.EventDetails}</Text>
+            <Text style={styles.eventName}>About</Text>
+
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.couple}
+                onPress={() => {
+                  console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
+                  navigation.navigate("RSVPScreen", {
+                    eventUUID: eventDetails?.EventUUID,
+                    UserId: UserId,
+                  });
+                }}
+              >
+                <Text style={styles.buttonText}>Groom</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.couple}
+                onPress={() => {
+                  console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
+                  navigation.navigate("RSVPScreen", {
+                    eventUUID: eventDetails?.EventUUID,
+                    UserId: UserId,
+                  });
+                }}
+              >
+                <Text style={styles.buttonText}>Bride</Text>
+              </TouchableOpacity>
             </View>
+            <View style={styles.eventDescriptionContainer}>
+              <Text style={styles.eventDescription}>
+                Dear {username} Ji,{"\n"}{eventDetails?.EventDetails}
+              </Text>
+            </View>
+
 
             <View style={styles.buttonContainer}>
               <TouchableOpacity
@@ -296,7 +353,7 @@ const EventDetails = ({ route, navigation }) => {
               style={styles.footerButton}
               onPress={() => {
                 console.log("Navigating to EventDetails with eventUUID:", eventUUID);
-                navigation.navigate("EventDetails", { eventUUID });
+                navigation.navigate("EventDetails", { eventUUID, UserId });
               }}
             >
               <Icon name="home-outline" size={24} color="#FFF" />
@@ -328,10 +385,14 @@ const EventDetails = ({ route, navigation }) => {
 
             <TouchableOpacity
               style={styles.footerButton}
-              onPress={toggleProfileModal}
+              onPress={() => {
+                console.log("Navigating to ProfileScreen with eventUUID and UserId:", eventUUID, UserId);
+                navigation.navigate("ProfileScreen", { UserId, eventUUID });
+              }}
             >
               <Icon name="person-outline" size={24} color="#FFF" />
             </TouchableOpacity>
+
           </View>
         </View>
       </SafeAreaView>
@@ -345,7 +406,7 @@ const EventDetails = ({ route, navigation }) => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             {profileData ? (
-              <>  
+              <>
                 <Text style={styles.profileDetails}>Status: {profileData.Status}</Text>
                 <Text style={styles.profileDetails}>Travel Date: {profileData.TravelDate}</Text>
               </>
@@ -409,11 +470,11 @@ const styles = StyleSheet.create({
 
   eventDescription: {
     fontSize: 16,
-    marginBottom: 20,
+    marginBottom: 5,
   },
 
   buttonContainer: {
-    marginTop: 20,
+
   },
   buttonText: {
     fontSize: 16,
@@ -428,6 +489,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
+  
+
 
   footer: {
     flexDirection: "row",
@@ -442,31 +505,30 @@ const styles = StyleSheet.create({
 
   circleButton: {
     position: "absolute",
-    bottom: 5,
     right: 5,
-    width: 70, 
-    height: 70, 
-    borderRadius: 35, 
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     justifyContent: "center",
     alignItems: "center",
-    borderWidth: 3, 
+    borderWidth: 3,
     borderColor: "#ff4500",
-    backgroundColor: "#000", 
+    backgroundColor: "#000",
     zIndex: 10,
   },
-  
+
   circleImage: {
     width: "100%",
     height: "100%",
-    borderRadius: 35, 
+    borderRadius: 35,
     resizeMode: "cover",
   },
-  
+
   modalContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-   backgroundColor: "rgba(232, 198, 188, 0.8)",
+    backgroundColor: "rgba(232, 198, 188, 0.8)",
   },
   modalContent: {
     width: 300,
@@ -484,6 +546,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
   },
+
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+   
+    
+  },
+
+  couple: {
+    flex: 1,
+    marginHorizontal: 5,
+    paddingVertical: 10,
+    backgroundColor: "#D08A76",
+    borderRadius: 10,
+    alignItems: "center",
+  }, 
+
   closeButton: {
     marginTop: 20,
     paddingVertical: 10,
