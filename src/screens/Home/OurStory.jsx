@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Baskervville_400Regular",
     marginTop: 20,  
     color: "black", 
     position: "absolute",
@@ -164,16 +164,16 @@ const styles = StyleSheet.create({
   },
   storyTitle: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular",
     textAlign: "center",
     color: "white",
-    marginBottom: 10,
   },
   storyDescription: {
     fontSize: 18,
     fontStyle: "italic", 
     color: "white",
     textAlign: "center",
+    fontFamily: "PTSans_400Regular",
   },
   errorText: {
     textAlign: "center",

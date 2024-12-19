@@ -90,8 +90,11 @@ const TravelDetails = ({ route }) => {
       style={styles.container}
     >
       <ScrollView>
+     
         {cardType === "Travel" && (
+          
           <View style={styles.travelContainer}>
+             <Text style={styles.header}>Travel</Text>
             {travelLinks.Ola && (
               <View style={styles.travelSection}>
                 <Image source={{ uri: 'https://cdn-bclnh.nitrocdn.com/HrhbFpIEQgeThoExdTufdJjReiWCKhjs/assets/images/optimized/rev-9a3864c/www.fugenx.com/wp-content/uploads/2018/12/How-Much-Does-it-Cost-to-Develop-an-App-like-Ola.jpg' }} style={styles.travelImage} />
@@ -109,6 +112,7 @@ const TravelDetails = ({ route }) => {
             )}
             {travelLinks.Uber && (
               <View style={styles.travelSection}>
+                
                 <Image source={{ uri: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQSj58VB-lmoKmOORTTTjiJ2FWAoXd8DABO3yH1RYlR0tvJF89VhCKB_yQAwa2dVV7iYIY&usqp=CAU' }} style={styles.travelImage} />
                 <Text style={styles.heading}>Uber</Text>
                 <TouchableOpacity
@@ -140,7 +144,7 @@ const TravelDetails = ({ route }) => {
         )}
         {cardType === "Local Attractions" && (
           <View style={styles.attractionsContainer}>
-            <Text style={styles.heading}>Local Attractions</Text>
+            <Text style={styles.header}>Local Attractions</Text>
             {attractions.length > 0 ? (
               attractions.map((attraction, index) => {
                 console.log("Rendering Attraction:", attraction);
@@ -201,14 +205,22 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+
+  header: {
+    fontSize: 18,
+    fontFamily: "Baskervville_400Regular",
+    marginTop:20, 
+    marginBottom:20, 
+  },
+
   heading: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
+    fontFamily: "Poppins_400Regular",
   },
   attractionName: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "PTSans_400Regular",
+
   },
   noDataText: {
     fontSize: 16,
@@ -225,7 +237,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Montserrat_400Regular", 
     color: "#FFF",
   },
 });

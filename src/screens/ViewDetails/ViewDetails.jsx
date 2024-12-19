@@ -266,14 +266,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular",
     color: "#333",
-    marginBottom: 5,
   },
   description: {
     fontSize: 14,
     color: "#666",
     marginBottom: 10,
+    fontFamily: "PTSans_400Regular",
   },
   footer: {
     position: "absolute", 

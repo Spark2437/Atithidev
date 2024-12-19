@@ -154,31 +154,32 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    fontFamily: "Poppins_400Regular", 
     marginTop: 15,
     color: 'black',
   },
   date: {
     fontSize: 16,
     color: 'black',
+    fontFamily: "PTSans_400Regular",
   },
   location: {
     fontSize: 16,
     marginBottom: 5,
     color: 'black',
+    fontFamily: "PTSans_400Regular",
   },
   description: {
     fontSize: 16,
-    marginTop: 10,
     color: 'black',
+    fontFamily: "PTSans_400Regular",
   },
   mapContainer: {
-
     flexDirection: 'row', 
     justifyContent: 'center', 
   },
   mapButton: {
+
     paddingVertical: 12,
     marginBottom: 10,
     backgroundColor: "#D08A76",
@@ -189,7 +190,7 @@ const styles = StyleSheet.create({
   mapButtonText: {
     color: 'white', 
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: "Montserrat_400Regular", 
   },
 });
 

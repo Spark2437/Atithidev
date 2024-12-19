@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const VendorDetails = ({ route }) => {
-  const { vendorUUID, eventUUID } = route.params; 
+  const { vendorUUID, eventUUID } = route.params;
   const [vendorDetails, setVendorDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -82,14 +82,14 @@ const styles = StyleSheet.create({
     marginTop: 40,
   },
   image: {
-    width: '100%', 
-    height: 400,   
-    resizeMode: 'contain', 
-},
+    width: '100%',
+    height: 400,
+    resizeMode: 'contain',
+  },
 
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: "Poppins_400Regular",
     color: '#333',
     marginBottom: 10,
   },
@@ -97,12 +97,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'black',
     marginBottom: 10,
-    marginTop:10, 
+    marginTop: 10,
+    fontFamily: "PTSans_400Regular",
   },
   location: {
     fontSize: 14,
     color: 'black',
     marginBottom: 10,
+    fontFamily: "PTSans_400Regular",
   },
   loaderContainer: {
     flex: 1,

@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   categoryTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Baskervville_400Regular",
     marginBottom: 10,
     color: "#333",
   },
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular",
     color: "#333",
-    marginBottom: 5,
   },
   description: {
     fontSize: 14,
     color: "#666",
+    fontFamily: "PTSans_400Regular"
   },
   loaderContainer: {
     flex: 1,

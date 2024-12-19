@@ -51,7 +51,7 @@ const NextEvent = ({ route, navigation }) => {
     month: "long",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true, 
+    hour12: true,
   });
 
   return (
@@ -117,22 +117,25 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular",
     color: "black",
   },
   dateTime: {
     fontSize: 16,
     color: "black",
+    fontFamily: "PTSans_400Regular",
   },
   location: {
     fontSize: 16,
     marginBottom: 5,
     color: "black",
+    fontFamily: "PTSans_400Regular",
   },
   shortDescription: {
     fontSize: 16,
     marginTop: 10,
     color: "black",
+    fontFamily: "PTSans_400Regular",
   },
   mapButton: {
     paddingVertical: 12,
@@ -141,10 +144,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     width: "100%",
+
   },
   mapButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Montserrat_400Regular",
     color: "#FFF",
   },
   loadingText: {

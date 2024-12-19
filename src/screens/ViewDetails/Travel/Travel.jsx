@@ -203,10 +203,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-   
-    justifyContent: "flex-start", 
+    backgroundColor: "rgba(232, 198, 188, 0.8)",
   },
   card: {
+    flex: 1,
     flexDirection: "column", 
     backgroundColor: "white",
     borderRadius: 10,
@@ -214,43 +214,45 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
-    marginTop: 20,
-    marginVertical: 10,
+    marginVertical: 10, 
     overflow: "hidden",
-    alignItems: "stretch", 
+    marginTop:40, 
   },
   image: {
     width: "100%", 
     height: 150,
-    resizeMode: "cover", 
+    resizeMode: "cover",
   },
   textContainer: {
-    flex: 1, 
-    padding: 15,
+    flex: 1,
+    padding: 10,
     justifyContent: "center", 
   },
   title: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular",
     color: "#333",
-    marginBottom: 5,
+    marginBottom: 5, 
   },
   description: {
     fontSize: 14,
     color: "#555",
-    marginVertical: 2,
+    fontFamily: "PTSans_400Regular",
+    marginBottom: 5, 
   },
   amenities: {
     fontSize: 14,
     color: "#555",
-    marginVertical: 2,
+    fontFamily: "PTSans_400Regular",
   },
   footer: {
     flexDirection: "row",
-    justifyContent: "space-around", 
+    justifyContent: "space-between", 
+    alignItems: "center", 
     backgroundColor: "#D08A76",
     paddingVertical: 10,
-    position: "absolute", 
+    paddingHorizontal: 20, 
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
@@ -258,8 +260,9 @@ const styles = StyleSheet.create({
   footerButton: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 15,
+    flex: 1, 
   },
 });
+
 
 export default Travel;

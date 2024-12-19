@@ -13,13 +13,13 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as ImagePicker from "expo-image-picker";
 
+
 const EventDetails = ({ route, navigation }) => {
   const { eventUUID, UserId } = route.params;
   const [eventDetails, setEventDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [circleImage, setCircleImage] = useState(null);
-
   const [username, setUsername] = useState("");
 
   useEffect(() => {
@@ -74,7 +74,7 @@ const EventDetails = ({ route, navigation }) => {
     setusername();
   }, [eventUUID]);
 
- 
+
 
   const setusername = () => {
     fetch("https://guest-event-app.onrender.com/api/Userdetailsbyuuid", {
@@ -87,7 +87,7 @@ const EventDetails = ({ route, navigation }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.status_code === 200 && data.Data.length > 0) {
-          setUsername(data.Data[0].Username); // Set the username
+          setUsername(data.Data[0].Username);
         } else {
           console.error("Error fetching username:", data.message);
         }
@@ -185,7 +185,7 @@ const EventDetails = ({ route, navigation }) => {
     }
   };
 
-  
+
 
   if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
   if (error) return <Text style={styles.errorText}>{error}</Text>;
@@ -263,26 +263,26 @@ const EventDetails = ({ route, navigation }) => {
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={styles.couple}
-               /* onPress={() => {
-                  console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
-                  navigation.navigate("RSVPScreen", {
-                    eventUUID: eventDetails?.EventUUID,
-                    UserId: UserId,
-                  });
-                }} */
+              /* onPress={() => {
+                 console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
+                 navigation.navigate("RSVPScreen", {
+                   eventUUID: eventDetails?.EventUUID,
+                   UserId: UserId,
+                 });
+               }} */
               >
                 <Text style={styles.buttonText}>Groom</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.couple}
-                /* onPress={() => {
-                  console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
-                  navigation.navigate("RSVPScreen", {
-                    eventUUID: eventDetails?.EventUUID,
-                    UserId: UserId,
-                  });
-                }} */
+              /* onPress={() => {
+                console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
+                navigation.navigate("RSVPScreen", {
+                  eventUUID: eventDetails?.EventUUID,
+                  UserId: UserId,
+                });
+              }} */
               >
                 <Text style={styles.buttonText}>Bride</Text>
               </TouchableOpacity>
@@ -399,13 +399,16 @@ const styles = StyleSheet.create({
 
   eventName: {
     fontSize: 24,
-    fontWeight: "bold",
-    marginVertical: 12,
+    marginTop: 5,
     textAlign: "left",
+   fontFamily: "Poppins_400Regular"
   },
 
-  eventDetails: { fontSize: 14, marginBottom: 8 },
-  boldText: { fontWeight: "bold" },
+  eventDetails: {
+    fontSize: 14,
+    marginBottom: 8,
+     fontFamily: 'PTSans_400Regular'
+  },
 
   rsvpButton: {
     alignSelf: "flex-start",
@@ -421,17 +424,15 @@ const styles = StyleSheet.create({
   },
 
   eventDescription: {
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 5,
+    fontFamily: 'PTSans_400Regular',
   },
 
-  buttonContainer: {
-
-  },
   buttonText: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#FFF",
+    fontFamily: 'Montserrat_400Regular'
   },
 
   ViewDetails: {
@@ -441,7 +442,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  
+
 
 
   footer: {
@@ -476,9 +477,8 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
 
-ofileTitle: {
+  ofileTitle: {
     fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 10,
   },
   profileDetails: {
@@ -490,8 +490,8 @@ ofileTitle: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-   
-    
+
+
   },
 
   couple: {
@@ -501,7 +501,7 @@ ofileTitle: {
     backgroundColor: "#D08A76",
     borderRadius: 10,
     alignItems: "center",
-  }, 
+  },
 
   closeButton: {
     marginTop: 20,
@@ -512,7 +512,6 @@ ofileTitle: {
   },
   closeButtonText: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#fff",
   },
 });

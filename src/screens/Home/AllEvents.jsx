@@ -15,8 +15,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { useUserContext } from "../../contexts/UserContext";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useFonts } from "expo-font";
+import { Baskervville_400Regular } from "@expo-google-fonts/baskervville";
+import { Roboto_400Regular } from "@expo-google-fonts/roboto";
+import { Montserrat_400Regular } from "@expo-google-fonts/montserrat";
+import { PTSans_400Regular } from '@expo-google-fonts/pt-sans';
+import { Poppins_400Regular } from '@expo-google-fonts/poppins';
 
 const AllEvents = ({ navigation }) => {
+  const [] = useFonts({
+    Baskervville_400Regular,
+    Roboto_400Regular,
+    Montserrat_400Regular,
+    PTSans_400Regular,
+    Poppins_400Regular,
+  });
+
   const { UserId, token, clearUserData } = useUserContext();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -155,13 +169,13 @@ const AllEvents = ({ navigation }) => {
   // Helper function to format date and time
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-  
+
     // Get day, month, and year
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "long" });
     const hours = date.getHours();
     const minutes = date.getMinutes();
-  
+
     // Add ordinal suffix for the day
     const suffix = (day) => {
       if (day >= 11 && day <= 13) return "th";
@@ -176,15 +190,14 @@ const AllEvents = ({ navigation }) => {
           return "th";
       }
     };
-  
+
     const formattedDay = `${day}${suffix(day)}`;
-    const formattedTime = `${hours % 12 || 12}:${
-      minutes < 10 ? "0" + minutes : minutes
-    } ${hours < 12 ? "am" : "pm"}`;
-  
+    const formattedTime = `${hours % 12 || 12}:${minutes < 10 ? "0" + minutes : minutes
+      } ${hours < 12 ? "am" : "pm"}`;
+
     return `${formattedDay} ${month}\n${formattedTime}`;
   };
-  
+
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]}
@@ -333,6 +346,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "column",
     justifyContent: "space-between",
+
   },
   profileTop: {
     alignItems: "center",
@@ -370,14 +384,15 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#333",
     marginTop: 10,
+    fontFamily: 'Baskervville_400Regular',
   },
   mobileNumber: {
     fontSize: 14,
     color: "#333",
     marginTop: 5,
+
   },
   profileButtons: {
     marginTop: "auto",
@@ -397,8 +412,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "#FFF",
+    fontFamily: 'Montserrat_400Regular',
   },
   eventList: {
     paddingBottom: 16,
@@ -423,26 +438,30 @@ const styles = StyleSheet.create({
   },
   eventTitle: {
     fontSize: 18,
-    fontFamily: "RobotoBold",
+    fontFamily: 'Poppins_400Regular',
   },
   eventLocation: {
     fontSize: 14,
     color: "#444",
+    fontFamily: 'PTSans_400Regular',
   },
   eventVenue: {
     fontSize: 14,
     color: "#444",
     marginTop: 4,
+    fontFamily: 'PTSans_400Regular',
   },
   eventCoupleName: {
     fontSize: 14,
     color: "#444",
     marginTop: 2,
+    fontFamily: 'PTSans_400Regular',
   },
   eventDate: {
     fontSize: 12,
     color: "#444",
     marginTop: 2,
+    fontFamily: 'PTSans_400Regular',
   },
   loadingText: {
     textAlign: "center",

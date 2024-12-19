@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
+import { useFonts } from "expo-font";  
+import { Baskervville_400Regular } from "@expo-google-fonts/baskervville";
+import { Roboto_400Regular } from "@expo-google-fonts/roboto";
+import { Montserrat_400Regular } from "@expo-google-fonts/montserrat";
+import { PTSans_400Regular } from '@expo-google-fonts/pt-sans';
+import { Poppins_400Regular } from '@expo-google-fonts/poppins';
 
 const LoginScreen = () => {
   const [name, setName] = useState("");  
@@ -9,6 +15,15 @@ const LoginScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigation = useNavigation();
+
+
+    const [] = useFonts({
+      Baskervville_400Regular,
+      Roboto_400Regular,
+      Montserrat_400Regular,
+      PTSans_400Regular,
+       Poppins_400Regular,
+    });
 
   const handleLogin = async () => {
     console.log("Entered Name:", name);
@@ -48,8 +63,6 @@ const LoginScreen = () => {
   
       if (data.status_code === 200) {
         alert("OTP sent successfully");
-
-  
         navigation.navigate("OTPScreen", { name, mobile });  
       } else {
         alert("Error in sending OTP. Please try again.");
@@ -62,24 +75,23 @@ const LoginScreen = () => {
     }
   };
 
+  
   return (
     <LinearGradient
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]} 
       style={styles.container}
     >
-      <Text style={styles.heading}>Enter Your Mobile Number</Text>
+      <Text style={[styles.heading, { fontFamily: "Poppins_400Regular" }]}>Enter Your Mobile Number</Text>
       
-    
       <TextInput
-        style={styles.input}
+        style={[styles.input, { fontFamily: "Roboto_400Regular" }]}
         placeholder="Name"
         value={name}
         onChangeText={setName}
       />
 
-     
       <TextInput
-        style={styles.input}
+        style={[styles.input, { fontFamily: "Roboto_400Regular" }]} 
         placeholder="Mobile Number"
         value={mobile}
         onChangeText={setMobile}
@@ -87,7 +99,6 @@ const LoginScreen = () => {
         maxLength={10}
       />
 
-  
       <TouchableOpacity
         style={[styles.button, isLoading && styles.buttonDisabled]}
         onPress={handleLogin}
@@ -96,7 +107,7 @@ const LoginScreen = () => {
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>Verify OTP</Text>
+          <Text style={[styles.buttonText, { fontFamily: "Montserrat_400Regular" }]}>Verify OTP</Text>  
         )}
       </TouchableOpacity>
     </LinearGradient>
@@ -112,7 +123,6 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 24,
-    fontWeight: "bold",
     marginBottom: 20,
     color: "#333",
   },
@@ -137,7 +147,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontWeight: "bold",
     fontSize: 18,
   },
 });

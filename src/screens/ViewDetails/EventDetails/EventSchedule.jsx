@@ -278,24 +278,23 @@ const styles = StyleSheet.create({
   },
   subEventTitle: {
     fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 4,
+    fontFamily: "Poppins_400Regular", 
     flexWrap: "wrap",
   },
   subEventDate: {
     fontSize: 14,
     color: "black",
-    marginBottom: 4,
+    fontFamily: "PTSans_400Regular", 
   },
   subEventTime: {
     fontSize: 14,
     color: "black",
-    marginBottom: 4,
+    fontFamily: "PTSans_400Regular", 
   },
   subEventLocation: {
     fontSize: 14,
     color: "black",
-    marginBottom: 8,
+    fontFamily: "PTSans_400Regular", 
   },
   errorText: {
     color: "black",

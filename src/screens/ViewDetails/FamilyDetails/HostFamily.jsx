@@ -266,13 +266,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+fontFamily: "Poppins_400Regular",
     textAlign: "center", 
   },
   description: {
     fontSize: 14,
     color: "#555",
     textAlign: "center", 
+    fontFamily: "PTSans_400Regular",
   },
   footer: {
     flexDirection: "row",

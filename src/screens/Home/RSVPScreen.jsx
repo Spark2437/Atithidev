@@ -3,12 +3,15 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import { LinearGradient } from "expo-linear-gradient";
 import { useUserContext } from "../../contexts/UserContext";
 
+
+
 const RSVP = ({ route, navigation }) => {
   const { eventUUID } = route.params;
   const { UserId, rsvpStatus, updateRSVPStatus } = useUserContext();
   const [response, setResponse] = useState(null);
   const [travelDate, setTravelDate] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
+
 
 
   useEffect(() => {
@@ -90,6 +93,10 @@ const RSVP = ({ route, navigation }) => {
       Alert.alert("Error", "Submission failed: " + err.message);
     }
   };
+
+  if (!fontsLoaded) {
+    return <Text>Loading fonts...</Text>; // or a custom loading screen
+  }
 
   return (
     <LinearGradient colors={["#f4f4f4", "#d3c6b3"]} style={styles.gradientContainer}>
@@ -227,6 +234,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
+    fontFamily: 'Montserrat_400Regular', // Apply Montserrat font here
   },
 });
 

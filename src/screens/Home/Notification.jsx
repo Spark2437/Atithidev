@@ -14,6 +14,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons"; 
 
 
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -31,6 +32,8 @@ const Notification = ({ navigation }) => {
     fetchNotifications();
   }, []);
 
+
+  
   const registerForPushNotifications = async () => {
     if (Device.isDevice) {
       const { status: existingStatus } =
@@ -150,6 +153,7 @@ const Notification = ({ navigation }) => {
               </TouchableOpacity>
             );
           })}
+          
         </ScrollView>
       </LinearGradient>
     </SafeAreaView>
@@ -177,7 +181,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 24,
     color: "black",
-    
+    fontFamily: 'Baskervville_400Regular',
   },
   scrollContainer: {
     padding: 10,
@@ -213,20 +217,22 @@ const styles = StyleSheet.create({
   
   h1: {
     fontSize: 16,
-    fontWeight: "bold",
     color: "black",
     flex: 1,
     marginLeft: 20,
+    fontFamily: 'Poppins_400Regular',
   },
   relativeTime: {
     fontSize: 14,
     color: "gray",
+    fontFamily: 'Roboto_400Regular',
   },
   p: {
     fontSize: 12,
     color: "black",
     marginTop: 5,
     marginLeft: 20,
+    fontFamily: 'PTSans_400Regular',
   },
 });
 

@@ -91,16 +91,18 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Poppins_400Regular", 
     color: "#fff",
   },
   relation: {
     fontSize: 18,
     color: "#fff",
+    fontFamily: "Roboto_400Regular"
   },
   description: {
     fontSize: 16,
     color: "#fff",
+    fontFamily: "PTSans_400Regular",
   },
   arrowButtonLeft: {
     position: 'absolute',

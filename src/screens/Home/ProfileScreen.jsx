@@ -1,10 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -12,6 +7,7 @@ const ProfileScreen = ({ route, navigation }) => {
   const { UserId, eventUUID } = route.params;
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
+
 
   useEffect(() => {
     console.log("Fetching profile data with:", { UserId, eventUUID });
@@ -47,15 +43,6 @@ const ProfileScreen = ({ route, navigation }) => {
         setLoading(false);
       });
   }, [UserId, eventUUID]);
-
-  if (loading) {
-    console.log("Loading data...");
-    return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#D08A76" />
-      </View>
-    );
-  }
 
   console.log("Rendering profile screen with profileData:", profileData);
 
@@ -96,12 +83,13 @@ const styles = StyleSheet.create({
   loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Montserrat_400Regular", 
     marginBottom: 20,
   },
   detailText: {
     fontSize: 18,
     marginBottom: 10,
+    fontFamily: "PTSans_400Regular",
   },
   errorText: {
     fontSize: 16,

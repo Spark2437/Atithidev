@@ -337,18 +337,18 @@ const styles = StyleSheet.create({
 
   // Stories Section Styles
   storiesContainer: { marginBottom: 20 },
-  storiesHeading: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
+  storiesHeading: { fontSize: 20,  marginBottom: 10 , fontFamily: "Poppins_400Regular" },
   storyCircleContainer: { alignItems: "center", marginRight: 15 },
   storyCircle: { borderWidth: 3, borderColor: "#ff4500", borderRadius: 40, padding: 3 },
   storyViewedCircle: { borderColor: "#ccc" },
   storyImage: { width: 70, height: 70, borderRadius: 35 },
-  storyUserName: { marginTop: 5, fontSize: 14, fontWeight: "500", textAlign: "center", color: "#333" },
+  storyUserName: { marginTop: 5, fontSize: 14,  textAlign: "center", color: "#333" ,fontFamily: "PTSans_400Regular", },
 
   // Categories Section Styles
   categoryContainer: { marginBottom: 20 },
-  categoryHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
-  categoryHeading: { fontSize: 18, fontWeight: "bold" },
-  seeAllText: { fontSize: 16, color: "black", fontWeight: "500" },
+  categoryHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" , },
+  categoryHeading: { fontSize: 18, fontFamily: "Poppins_400Regular" },
+  seeAllText: { fontSize: 16, color: "black", fontFamily: "PTSans_400Regular" },
   gridContainer: { flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", marginTop: 10 },
   imageContainer: { width: "30%", marginBottom: 10 },
   image: { width: "100%", aspectRatio: 1, borderRadius: 8 },
