@@ -17,13 +17,13 @@ const LoginScreen = () => {
   const navigation = useNavigation();
 
 
-    const [] = useFonts({
-      Baskervville_400Regular,
-      Roboto_400Regular,
-      Montserrat_400Regular,
-      PTSans_400Regular,
-       Poppins_400Regular,
-    });
+  const [] = useFonts({
+    Baskervville_400Regular,
+    Roboto_400Regular,
+    Montserrat_400Regular,
+    PTSans_400Regular,
+    Poppins_400Regular,
+  });
 
   const handleLogin = async () => {
     console.log("Entered Name:", name);
