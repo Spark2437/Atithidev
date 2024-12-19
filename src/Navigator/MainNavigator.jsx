@@ -4,6 +4,7 @@ import AllEvents from "../screens/Home/AllEvents";
 import Notification from "../screens/Home/Notification";
 import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
 import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
+import ProfileScreen from "../screens/Home/ProfileScreen";
 import OurStory from "../screens/Home/OurStory";
 import ViewDetails from "../screens/ViewDetails/ViewDetails";
 import RSVP from "../screens/Home/RSVPScreen";
@@ -63,7 +64,11 @@ const MainNavigator = () => (
       options={{ headerShown: false }}
     />
 
-
+<Stack.Screen
+      name="ProfileScreen"
+      component={ProfileScreen}
+      options={{ headerShown: false }}
+    />
     <Stack.Screen
       name="ViewDetails"
       component={ViewDetails}

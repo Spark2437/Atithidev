@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import { UserProvider, useUserContext } from "./contexts/UserContext"; 
+import { UserProvider, useUserContext, } from "./contexts/UserContext"; 
 import AuthNavigator from "./Navigator/AuthNavigator";
 import MainNavigator from "./Navigator/MainNavigator";
 import { StatusBar } from 'expo-status-bar'; 

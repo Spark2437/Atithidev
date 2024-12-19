@@ -1,17 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useUserContext } from "../../contexts/UserContext";
 
 const RSVP = ({ route, navigation }) => {
-  const { eventUUID, UserId } = route.params;
+  const { eventUUID } = route.params;
+  const { UserId, rsvpStatus, updateRSVPStatus } = useUserContext();
   const [response, setResponse] = useState(null);
   const [travelDate, setTravelDate] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
 
-  console.log("Event UUID:", eventUUID);
-  console.log("User ID:", UserId);
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    if (rsvpStatus[eventUUID]) {
+      Alert.alert("Info", "You have already submitted your RSVP.");
+      navigation.goBack("EventdetailsScreen");
+    }
+  }, [rsvpStatus, eventUUID, navigation]);
+
+  const handleOptionSelect = (option) => {
+    setResponse(option);
+    if (option === "Happily Attending") {
+      setIsFormVisible(true); 
+    } else {
+      setIsFormVisible(false); 
+    }
+  };
+
+  const handleSubmit = async () => {
     if (!response) {
       Alert.alert("Incomplete", "Please select an option before submitting.");
       return;
@@ -22,71 +38,58 @@ const RSVP = ({ route, navigation }) => {
       return;
     }
 
-    // Log the values before submitting
-    console.log("Submitting RSVP with UserId:", UserId);
-    console.log("EventUUID:", eventUUID);
-    console.log("Response:", response);
-
     if (response === "Happily Attending" && !travelDate) {
       Alert.alert("Incomplete", "Please fill in your Travel Date.");
       return;
     }
 
-    // Submit RSVP response
-    fetch("https://guest-event-app.onrender.com/api/ComingornotStatus", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        UserId: UserId,
-        EventUUID: eventUUID,
-        Status: response,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status_code === 200) {
-          Alert.alert("Success", "Your response has been submitted.");
+    try {
+      // Submit RSVP response
+      const rsvpResponse = await fetch("https://guest-event-app.onrender.com/api/ComingornotStatus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          UserId,
+          EventUUID: eventUUID,
+          Status: response,
+        }),
+      });
+      const rsvpData = await rsvpResponse.json();
 
-          if (response === "Happily Attending") {
-            fetch("https://guest-event-app.onrender.com/api/UserProfileDatabyuuid", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                EventUUID: eventUUID, 
-                UserId: UserId,
-                TravelDate: travelDate, 
-              }),
-            })
-              .then((res) => res.json())
-              .then((data) => {
-                if (data.status_code === 200) {
-                  Alert.alert("Success", "Your profile has been updated.");
-                  navigation.goBack(); 
-                } else {
-                  Alert.alert("Error", data.message || "Failed to update profile.");
-                }
-              })
-              .catch((err) => Alert.alert("Error", "Profile update failed: " + err.message));
+      if (rsvpData.status_code === 200) {
+        Alert.alert("Success", "Your response has been submitted.");
+        await updateRSVPStatus(eventUUID, response);
+
+        if (response === "Happily Attending") {
+          // Submit travel date
+          const travelResponse = await fetch("https://guest-event-app.onrender.com/api/UserProfileDatabyuuid", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              EventUUID: eventUUID,
+              UserId,
+              TravelDate: travelDate,
+            }),
+          });
+          const travelData = await travelResponse.json();
+
+          if (travelData.status_code === 200) {
+            Alert.alert("Success", "Your travel details have been updated.");
           } else {
-            navigation.goBack();
+            Alert.alert("Error", travelData.message || "Failed to update travel details.");
           }
-        } else {
-          Alert.alert("Error", data.message || "Failed to submit RSVP.");
         }
-      })
-      .catch((err) => Alert.alert("Error", "Submission failed: " + err.message));
-  };
 
-  const handleOptionSelect = (option) => {
-    setResponse(option);
-    if (option === "Happily Attending") {
-      setIsFormVisible(true); 
-    } else {
-      setIsFormVisible(false); 
+        navigation.goBack();
+      } else {
+        Alert.alert("Error", rsvpData.message || "Failed to submit RSVP.");
+      }
+    } catch (err) {
+      Alert.alert("Error", "Submission failed: " + err.message);
     }
   };
 
@@ -99,7 +102,7 @@ const RSVP = ({ route, navigation }) => {
             Invite You to Share{'\n'}in the Joy of Our Marriage
           </Text>
 
-          {/* Options */}
+          {/* RSVP Options */}
           <View style={styles.subheadingContainer}>
             {RSVP_OPTIONS.map((option, index) => (
               <TouchableOpacity

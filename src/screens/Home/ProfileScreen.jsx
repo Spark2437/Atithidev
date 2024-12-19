@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
@@ -15,7 +14,8 @@ const ProfileScreen = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch profile data
+    console.log("Fetching profile data with:", { UserId, eventUUID });
+
     fetch("https://guest-event-app.onrender.com/api/UserComingDetails", {
       method: "POST",
       headers: {
@@ -23,27 +23,41 @@ const ProfileScreen = ({ route, navigation }) => {
       },
       body: JSON.stringify({ UserId, EventUUID: eventUUID }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        console.log("API Response received:", response);
+        return response.json();
+      })
       .then((data) => {
-        if (data.status_code === 200) {
+        console.log("Parsed response data:", data);
+
+        if (data.status_code === 200 && data.Data) {
+          console.log("Profile data fetched successfully:", data.Data);
           setProfileData(data.Data);
         } else {
-          Alert.alert("Error", "Failed to fetch profile data.");
+          console.log("No profile data found or invalid response.");
+          setProfileData(null);
         }
       })
       .catch((error) => {
         console.error("Error fetching profile data:", error);
-        Alert.alert("Error", "Unable to fetch profile data.");
+        setProfileData(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        console.log("Data fetching completed.");
+        setLoading(false);
+      });
   }, [UserId, eventUUID]);
 
-  if (loading)
+  if (loading) {
+    console.log("Loading data...");
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#D08A76" />
       </View>
     );
+  }
+
+  console.log("Rendering profile screen with profileData:", profileData);
 
   return (
     <LinearGradient
@@ -61,7 +75,9 @@ const ProfileScreen = ({ route, navigation }) => {
               </Text>
             </>
           ) : (
-            <Text style={styles.errorText}>No profile data available.</Text>
+            <Text style={styles.errorText}>
+              No profile data available. Please fill RSVP.
+            </Text>
           )}
         </View>
       </SafeAreaView>

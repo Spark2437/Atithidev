@@ -7,8 +7,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Modal,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -21,8 +19,7 @@ const EventDetails = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [circleImage, setCircleImage] = useState(null);
-  const [profileData, setProfileData] = useState(null);
-  const [isProfileModalVisible, setProfileModalVisible] = useState(false);
+
   const [username, setUsername] = useState("");
 
   useEffect(() => {
@@ -73,31 +70,11 @@ const EventDetails = ({ route, navigation }) => {
       });
 
     // Fetch profile data
-    fetchProfileData();
+
     setusername();
   }, [eventUUID]);
 
-  const fetchProfileData = () => {
-    fetch("https://guest-event-app.onrender.com/api/UserComingDetails", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ UserId: UserId, EventUUID: eventUUID }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status_code === 200) {
-          setProfileData(data.Data);
-        } else {
-          Alert.alert("Error", "Failed to fetch profile data.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching profile data:", error);
-        Alert.alert("Error", "Unable to fetch profile data.");
-      });
-  };
+ 
 
   const setusername = () => {
     fetch("https://guest-event-app.onrender.com/api/Userdetailsbyuuid", {
@@ -208,9 +185,7 @@ const EventDetails = ({ route, navigation }) => {
     }
   };
 
-  const toggleProfileModal = () => {
-    setProfileModalVisible(!isProfileModalVisible);
-  };
+  
 
   if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
   if (error) return <Text style={styles.errorText}>{error}</Text>;
@@ -288,26 +263,26 @@ const EventDetails = ({ route, navigation }) => {
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={styles.couple}
-                onPress={() => {
+               /* onPress={() => {
                   console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
                   navigation.navigate("RSVPScreen", {
                     eventUUID: eventDetails?.EventUUID,
                     UserId: UserId,
                   });
-                }}
+                }} */
               >
                 <Text style={styles.buttonText}>Groom</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={styles.couple}
-                onPress={() => {
+                /* onPress={() => {
                   console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
                   navigation.navigate("RSVPScreen", {
                     eventUUID: eventDetails?.EventUUID,
                     UserId: UserId,
                   });
-                }}
+                }} */
               >
                 <Text style={styles.buttonText}>Bride</Text>
               </TouchableOpacity>
@@ -396,29 +371,6 @@ const EventDetails = ({ route, navigation }) => {
           </View>
         </View>
       </SafeAreaView>
-
-      {/* Profile Modal */}
-      <Modal
-        visible={isProfileModalVisible}
-        animationType="slide"
-        onRequestClose={toggleProfileModal}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            {profileData ? (
-              <>
-                <Text style={styles.profileDetails}>Status: {profileData.Status}</Text>
-                <Text style={styles.profileDetails}>Travel Date: {profileData.TravelDate}</Text>
-              </>
-            ) : (
-              <ActivityIndicator size="large" color="#D08A76" />
-            )}
-            <TouchableOpacity style={styles.closeButton} onPress={toggleProfileModal}>
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </LinearGradient>
   );
 };
@@ -524,20 +476,7 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
 
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(232, 198, 188, 0.8)",
-  },
-  modalContent: {
-    width: 300,
-    padding: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  profileTitle: {
+ofileTitle: {
     fontSize: 24,
     fontWeight: "bold",
     marginBottom: 10,
