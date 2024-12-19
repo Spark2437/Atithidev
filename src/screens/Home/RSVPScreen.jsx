@@ -13,7 +13,7 @@ const RSVP = ({ route, navigation }) => {
 
   useEffect(() => {
     if (rsvpStatus[eventUUID]) {
-      Alert.alert("Info", "You have already submitted your RSVP.");
+      Alert.alert("You have already submitted your RSVP.");
       navigation.goBack("EventdetailsScreen");
     }
   }, [rsvpStatus, eventUUID, navigation]);
@@ -44,7 +44,6 @@ const RSVP = ({ route, navigation }) => {
     }
 
     try {
-      // Submit RSVP response
       const rsvpResponse = await fetch("https://guest-event-app.onrender.com/api/ComingornotStatus", {
         method: "POST",
         headers: {
@@ -63,7 +62,6 @@ const RSVP = ({ route, navigation }) => {
         await updateRSVPStatus(eventUUID, response);
 
         if (response === "Happily Attending") {
-          // Submit travel date
           const travelResponse = await fetch("https://guest-event-app.onrender.com/api/UserProfileDatabyuuid", {
             method: "POST",
             headers: {
@@ -84,7 +82,7 @@ const RSVP = ({ route, navigation }) => {
           }
         }
 
-        navigation.goBack();
+        navigation.goBack("EventdetailsScreen");
       } else {
         Alert.alert("Error", rsvpData.message || "Failed to submit RSVP.");
       }
