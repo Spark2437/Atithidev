@@ -17,7 +17,7 @@ const RSVP = ({ route, navigation }) => {
   useEffect(() => {
     if (rsvpStatus[eventUUID]) {
       Alert.alert("You have already submitted your RSVP.");
-      navigation.goBack("EventdetailsScreen");
+      navigation.goBack("EventDetails");
     }
   }, [rsvpStatus, eventUUID, navigation]);
 
@@ -85,7 +85,7 @@ const RSVP = ({ route, navigation }) => {
           }
         }
 
-        navigation.goBack("EventdetailsScreen");
+        navigation.navigate("EventDetails", { eventUUID });
       } else {
         Alert.alert("Error", rsvpData.message || "Failed to submit RSVP.");
       }
@@ -94,9 +94,7 @@ const RSVP = ({ route, navigation }) => {
     }
   };
 
-  if (!fontsLoaded) {
-    return <Text>Loading fonts...</Text>; // or a custom loading screen
-  }
+  
 
   return (
     <LinearGradient colors={["#f4f4f4", "#d3c6b3"]} style={styles.gradientContainer}>

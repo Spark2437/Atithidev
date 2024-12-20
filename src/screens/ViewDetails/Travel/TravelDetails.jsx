@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    fontSize: 18,
+    fontSize: 24,
     fontFamily: "Baskervville_400Regular",
     marginTop:20, 
     marginBottom:20, 

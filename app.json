@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.spark2437.Atithidev"
     },
     "android": {
       "adaptiveIcon": {
@@ -33,26 +34,22 @@
     "splash": {
       "image": "./assets/images/splash-icon.png"
     },
-
-"plugins": [
-  "expo-router",
-  [
-    "expo-font",
-    {
-      "fonts": [
-      
+    "plugins": [
+      "expo-router",
+      [
+        "expo-font",
+        {
+          "fonts": []
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {}
+        }
       ]
-    }
-  ],
-  "expo-secure-store",
-  [
-    "expo-build-properties",
-    {
-      "android": {}
-    }
-  ]
-], 
-
+    ],
     "experiments": {
       "typedRoutes": true
     },
