@@ -81,7 +81,7 @@ const LoginScreen = () => {
       colors={["rgba(232, 198, 188, 0.8)", "rgba(146, 101, 89, 0.5)"]} 
       style={styles.container}
     >
-      <Text style={[styles.heading, { fontFamily: "Poppins_400Regular" }]}>Enter Your Mobile Number</Text>
+      <Text style={[styles.heading, { fontFamily: "Poppins_400Regular" }]}>Enter Your Number</Text>
       
       <TextInput
         style={[styles.input, { fontFamily: "Roboto_400Regular" }]}
@@ -107,7 +107,7 @@ const LoginScreen = () => {
         {isLoading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (
-          <Text style={[styles.buttonText, { fontFamily: "Montserrat_400Regular" }]}>Verify OTP</Text>  
+          <Text style={[styles.buttonText, { fontFamily: "Montserrat_400Regular" }]}>Verify </Text>  
         )}
       </TouchableOpacity>
     </LinearGradient>

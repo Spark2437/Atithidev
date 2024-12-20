@@ -1,14 +1,13 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Create context
+
 const UserContext = createContext();
 
-// Define provider
 export const UserProvider = ({ children }) => {
   const [UserId, setUserId] = useState(null);
   const [token, setToken] = useState(null);
-  const [rsvpStatus, setRsvpStatus] = useState({}); // Track RSVP statuses
+  const [rsvpStatus, setRsvpStatus] = useState({});
 
   const checkUserStatus = async () => {
     const storedUserId = await AsyncStorage.getItem("UserId");
@@ -58,5 +57,4 @@ export const UserProvider = ({ children }) => {
   );
 };
 
-// Hook to use UserContext
 export const useUserContext = () => useContext(UserContext);

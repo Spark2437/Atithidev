@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     marginVertical: 10, 
     overflow: "hidden",
-    marginTop:40, 
+    marginTop:30, 
   },
   image: {
     width: "100%", 
