@@ -245,9 +245,7 @@ const AllEvents = ({ navigation }) => {
                     </Text>
                     <Text style={styles.eventLocation}>
                       City: {event.EventCity}</Text>
-                    <Text style={styles.eventVenue}>
-                      Venue: {event.EventVenue}
-                    </Text>
+                 
                     <Text style={styles.eventDate}>
                       {formatDate(event.EventStartDate)}
                     </Text>

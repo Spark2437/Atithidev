@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator, TextInput, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -7,7 +7,8 @@ const ProfileScreen = ({ route, navigation }) => {
   const { UserId, eventUUID } = route.params;
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [newStatus, setNewStatus] = useState("");
+  const [newTravelDate, setNewTravelDate] = useState("");  
 
   useEffect(() => {
     console.log("Fetching profile data with:", { UserId, eventUUID });
@@ -44,6 +45,45 @@ const ProfileScreen = ({ route, navigation }) => {
       });
   }, [UserId, eventUUID]);
 
+  const handleUpdateProfile = async () => {
+    if (!newStatus || !newTravelDate) {
+      Alert.alert("Incomplete", "Please fill in both status and travel date.");
+      return;
+    }
+
+    console.log("Updating profile with new data:", { newStatus, newTravelDate });
+
+    try {
+      const response = await fetch("https://guest-event-app.onrender.com/api/UserProfileDatabyuuid", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          Status: newStatus,
+          TravelDate: newTravelDate,
+          UserId,
+          EventUUID: eventUUID,
+        }),
+      });
+
+      const data = await response.json();
+      console.log("API Response received for update:", data);
+
+      if (data.status_code === 200) {
+        console.log("Profile updated successfully:", data.Data);
+        Alert.alert("Success", "Your profile has been updated.");
+        setProfileData(data.Data);  // Update profile data after successful update
+      } else {
+        console.log("Failed to update profile:", data.message);
+        Alert.alert("Error", data.message || "Failed to update profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", "An error occurred while updating your profile.");
+    }
+  };
+
   console.log("Rendering profile screen with profileData:", profileData);
 
   return (
@@ -54,17 +94,36 @@ const ProfileScreen = ({ route, navigation }) => {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
           <Text style={styles.title}>Profile Details</Text>
-          {profileData ? (
+          {loading ? (
+            <ActivityIndicator size="large" color="#C19264" />
+          ) : profileData ? (
             <>
               <Text style={styles.detailText}>Status: {profileData.Status}</Text>
-              <Text style={styles.detailText}>
-                Travel Date: {profileData.TravelDate}
-              </Text>
+              <Text style={styles.detailText}>Travel Date: {profileData.TravelDate}</Text>
+
+              <Text style={styles.update}>Have Some Other Plans?</Text>
+              
+              <View style={styles.form}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="New Status"
+                  value={newStatus}
+                  onChangeText={setNewStatus}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="New Travel Date (YYYY-MM-DD)"
+                  value={newTravelDate}
+                  onChangeText={setNewTravelDate}
+                />
+              </View>
+
+              <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile}>
+                <Text style={styles.updateButtonText}>Update Profile</Text>
+              </TouchableOpacity>
             </>
           ) : (
-            <Text style={styles.errorText}>
-              No profile data available. Please fill RSVP.
-            </Text>
+            <Text style={styles.errorText}>No profile data available. Please fill RSVP.</Text>
           )}
         </View>
       </SafeAreaView>
@@ -83,7 +142,7 @@ const styles = StyleSheet.create({
   loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: {
     fontSize: 24,
-    fontFamily: "Montserrat_400Regular", 
+    fontFamily: "Montserrat_400Regular",
     marginBottom: 20,
   },
   detailText: {
@@ -94,6 +153,35 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: 16,
     color: "#666",
+  },
+  form: {
+    marginVertical: 20,
+    width: "80%",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    width: "100%",
+  },
+   update: {
+    fontSize: 24,
+    fontFamily: "Montserrat_400Regular",
+    marginTop: 20,
+   }, 
+   
+  updateButton: {
+    backgroundColor: "#D08A76",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+  },
+  updateButtonText: {
+    fontSize: 18,
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 

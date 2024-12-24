@@ -6,6 +6,8 @@ import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
 import EventDetailsScreen from "../screens/Home/EventDetailsScreen";
 import ProfileScreen from "../screens/Home/ProfileScreen";
 import OurStory from "../screens/Home/OurStory";
+import Groom from "../screens/Home/Groom";
+import Bride from "../screens/Home/Bride";
 import ViewDetails from "../screens/ViewDetails/ViewDetails";
 import RSVP from "../screens/Home/RSVPScreen";
 import MediaScreen from "../screens/Media/MediaScreen";
@@ -67,6 +69,18 @@ const MainNavigator = () => (
 <Stack.Screen
       name="ProfileScreen"
       component={ProfileScreen}
+      options={{ headerShown: false }}
+    />
+
+<Stack.Screen
+      name="Groom"
+      component={Groom}
+      options={{ headerShown: false }}
+    />
+
+<Stack.Screen
+      name="Bride"
+      component={Bride}
       options={{ headerShown: false }}
     />
     <Stack.Screen

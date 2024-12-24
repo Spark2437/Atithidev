@@ -1,100 +1,90 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useUserContext } from "../../contexts/UserContext";
-
-
 
 const RSVP = ({ route, navigation }) => {
-  const { eventUUID } = route.params;
-  const { UserId, rsvpStatus, updateRSVPStatus } = useUserContext();
+  const { UserId, eventUUID } = route.params; 
   const [response, setResponse] = useState(null);
   const [travelDate, setTravelDate] = useState("");
   const [isFormVisible, setIsFormVisible] = useState(false);
-
-
+  const [rsvpStatus, setRsvpStatus] = useState({}); 
 
   useEffect(() => {
+    console.log("useEffect: Checking if the user has already submitted RSVP for eventUUID:", eventUUID);
+    console.log("useEffect: UserId from route params:", UserId); 
+
+  
     if (rsvpStatus[eventUUID]) {
+      console.log("RSVP already submitted for this event:", rsvpStatus[eventUUID]);
       Alert.alert("You have already submitted your RSVP.");
       navigation.goBack("EventDetails");
     }
-  }, [rsvpStatus, eventUUID, navigation]);
+  }, [rsvpStatus, eventUUID, UserId, navigation]); 
 
   const handleOptionSelect = (option) => {
+    console.log("handleOptionSelect: Selected option:", option);
+    console.log("handleOptionSelect: UserId:", UserId); 
     setResponse(option);
     if (option === "Happily Attending") {
+      console.log("Option 'Happily Attending' selected, showing travel date form.");
       setIsFormVisible(true); 
     } else {
+      console.log("Option 'Sadly Declining' selected, hiding travel date form.");
       setIsFormVisible(false); 
     }
   };
 
   const handleSubmit = async () => {
+    console.log("handleSubmit: Submitting RSVP with response:", response, "and travelDate:", travelDate);
+    console.log("handleSubmit: UserId:", UserId); 
+
     if (!response) {
+      console.log("Incomplete RSVP submission: No option selected.");
       Alert.alert("Incomplete", "Please select an option before submitting.");
       return;
     }
 
-    if (!UserId) {
-      Alert.alert("Error", "User ID is missing.");
-      return;
-    }
-
     if (response === "Happily Attending" && !travelDate) {
+      console.log("Incomplete RSVP submission: Travel Date is required for 'Happily Attending'.");
       Alert.alert("Incomplete", "Please fill in your Travel Date.");
       return;
     }
 
     try {
+
+      const updatedRsvpStatus = { ...rsvpStatus, [eventUUID]: response };
+      console.log("Updating local RSVP status:", updatedRsvpStatus);
+      setRsvpStatus(updatedRsvpStatus);
+
+      
       const rsvpResponse = await fetch("https://guest-event-app.onrender.com/api/ComingornotStatus", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          UserId,
+          UserId: UserId, 
           EventUUID: eventUUID,
           Status: response,
+          TravelDate: travelDate,  
         }),
       });
       const rsvpData = await rsvpResponse.json();
+      console.log("RSVP submission response from server:", rsvpData);
 
       if (rsvpData.status_code === 200) {
+        console.log("RSVP submission successful.");
         Alert.alert("Success", "Your response has been submitted.");
-        await updateRSVPStatus(eventUUID, response);
-
-        if (response === "Happily Attending") {
-          const travelResponse = await fetch("https://guest-event-app.onrender.com/api/UserProfileDatabyuuid", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              EventUUID: eventUUID,
-              UserId,
-              TravelDate: travelDate,
-            }),
-          });
-          const travelData = await travelResponse.json();
-
-          if (travelData.status_code === 200) {
-            Alert.alert("Success", "Your travel details have been updated.");
-          } else {
-            Alert.alert("Error", travelData.message || "Failed to update travel details.");
-          }
-        }
-
         navigation.navigate("EventDetails", { eventUUID });
       } else {
+        console.log("Error in RSVP submission:", rsvpData.message);
         Alert.alert("Error", rsvpData.message || "Failed to submit RSVP.");
       }
     } catch (err) {
+      console.log("Error in submitting RSVP:", err.message);
       Alert.alert("Error", "Submission failed: " + err.message);
     }
   };
-
-  
 
   return (
     <LinearGradient colors={["#f4f4f4", "#d3c6b3"]} style={styles.gradientContainer}>
@@ -232,7 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
-    fontFamily: 'Montserrat_400Regular', // Apply Montserrat font here
   },
 });
 

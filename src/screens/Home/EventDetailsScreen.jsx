@@ -22,6 +22,12 @@ const EventDetails = ({ route, navigation }) => {
   const [circleImage, setCircleImage] = useState(null);
   const [username, setUsername] = useState("");
 
+  const [groomDescription, setGroomDescription] = useState("");
+  const [brideDescription, setBrideDescription] = useState("");
+  const [brideName, setBrideName] = useState("");
+  const [groomName, setGroomName] = useState("");
+
+
   useEffect(() => {
     console.log("Fetching event details for EventUUID:", eventUUID);
 
@@ -69,12 +75,34 @@ const EventDetails = ({ route, navigation }) => {
         console.error("Error fetching circle image:", err);
       });
 
-    // Fetch profile data
 
+    // Fetch bride and groom names
+    fetch("https://guest-event-app.onrender.com/api/GroomBridedetails", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ EventUUID: eventUUID }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.status_code === 200 && data.Data.length > 0) {
+          const { GroomName, BrideName } = data.Data[0];
+          setGroomName(GroomName);
+          setBrideName(BrideName);
+          setGroomDescription(groomDescription);
+          setBrideDescription(brideDescription);
+        } else {
+          console.error("Error fetching groom and bride details:", data.message);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching groom and bride details:", err);
+      });
+
+    // Fetch profile data
     setusername();
   }, [eventUUID]);
-
-
 
   const setusername = () => {
     fetch("https://guest-event-app.onrender.com/api/Userdetailsbyuuid", {
@@ -96,7 +124,6 @@ const EventDetails = ({ route, navigation }) => {
         console.error("Error fetching username:", err);
       });
   };
-
 
   const openCamera = async () => {
     try {
@@ -185,8 +212,6 @@ const EventDetails = ({ route, navigation }) => {
     }
   };
 
-
-
   if (loading) return <Text style={styles.loadingText}>Loading event details...</Text>;
   if (error) return <Text style={styles.errorText}>{error}</Text>;
 
@@ -204,8 +229,6 @@ const EventDetails = ({ route, navigation }) => {
                   source={{ uri: eventDetails.EventImage }}
                   style={styles.eventImage}
                 />
-
-
               </View>
             )}
             <Text style={styles.eventName}>{eventDetails?.CoupleName}</Text>
@@ -225,9 +248,6 @@ const EventDetails = ({ route, navigation }) => {
               <View style={styles.eventDetailsContainer}>
                 <Text style={styles.eventDetails}>
                   <Text style={styles.boldText}>Location:</Text> {eventDetails?.EventCity}
-                </Text>
-                <Text style={styles.eventDetails}>
-                  <Text style={styles.boldText}>Venue:</Text> {eventDetails?.EventVenue}
                 </Text>
                 <Text style={styles.eventDetails}>
                   <Text style={styles.boldText}>Date:</Text>
@@ -260,33 +280,46 @@ const EventDetails = ({ route, navigation }) => {
 
             <Text style={styles.eventName}>About</Text>
 
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={styles.couple}
-              /* onPress={() => {
-                 console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
-                 navigation.navigate("RSVPScreen", {
-                   eventUUID: eventDetails?.EventUUID,
-                   UserId: UserId,
-                 });
-               }} */
-              >
-                <Text style={styles.buttonText}>Groom</Text>
-              </TouchableOpacity>
+            <View style={styles.container}>
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.couple}
+                  onPress={() => {
+                    console.log(
+                      "Navigating to Groom screen with eventUUID:",
+                      eventDetails?.EventUUID
+                    );
+                    console.log("Groom Description:", groomDescription);
+                    navigation.navigate("Groom", {
+                      eventUUID: eventDetails?.EventUUID,
+                      UserId: UserId,
+                      GroomDescription: groomDescription,
+                    });
+                  }}
+                >
+                  <Text style={styles.buttonText}>{groomName || "Groom"}</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.couple}
-              /* onPress={() => {
-                console.log("Navigating to RSVP Screen with eventUUID:", eventDetails?.EventUUID);
-                navigation.navigate("RSVPScreen", {
-                  eventUUID: eventDetails?.EventUUID,
-                  UserId: UserId,
-                });
-              }} */
-              >
-                <Text style={styles.buttonText}>Bride</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.couple}
+                  onPress={() => {
+                    console.log(
+                      "Navigating to Bride screen with eventUUID:",
+                      eventDetails?.EventUUID
+                    );
+                    console.log("Bride Description:", brideDescription);
+                    navigation.navigate("Bride", {
+                      eventUUID: eventDetails?.EventUUID,
+                      UserId: UserId,
+                      BrideDescription: brideDescription,
+                    });
+                  }}
+                >
+                  <Text style={styles.buttonText}>{brideName || "Bride"}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
             <View style={styles.eventDescriptionContainer}>
               <Text style={styles.eventDescription}>
                 Dear {username} Ji,{"\n"}{eventDetails?.EventDetails}
@@ -318,7 +351,7 @@ const EventDetails = ({ route, navigation }) => {
                   });
                 }}
               >
-                <Text style={styles.buttonText}>Event Starts Here</Text>
+                <Text style={styles.buttonText}>Next Upcoming Event</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -401,13 +434,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     marginTop: 5,
     textAlign: "left",
-   fontFamily: "Poppins_400Regular"
+    fontFamily: "Poppins_400Regular"
   },
 
   eventDetails: {
     fontSize: 14,
     marginBottom: 8,
-     fontFamily: 'PTSans_400Regular'
+    fontFamily: 'PTSans_400Regular'
   },
 
   rsvpButton: {
