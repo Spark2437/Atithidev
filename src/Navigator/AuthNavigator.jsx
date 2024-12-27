@@ -1,4 +1,3 @@
-/* 
 import React, { Suspense } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import LoginScreen from "../screens/Auth/LoginScreen"; 
@@ -29,4 +28,3 @@ const AuthNavigator = () => {
 };
 
 export default AuthNavigator;
-*/

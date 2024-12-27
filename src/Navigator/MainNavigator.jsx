@@ -1,5 +1,6 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
+import { useUserContext } from "../contexts/UserContext";
 import AllEvents from "../screens/Home/AllEvents";
 import Notification from "../screens/Home/Notification";
 import SplashScreenEvents from "../screens/Home/SplashScreenEvents";
@@ -25,25 +26,30 @@ import Vendors from "../screens/ViewDetails/Vendors/Vendors";
 import VendorDetails from "../screens/ViewDetails/Vendors/VendorDetails";
 import NextEvent from "../screens/ViewDetails/NextEvent/NextEvent";
 
+
 const Stack = createStackNavigator();
 
-const MainNavigator = () => (
+const MainNavigator = () => {
+  const { UserId, token } = useUserContext();  // Access UserId and token
 
-  <Stack.Navigator
-    initialRouteName="AllEvents"
-    screenOptions={{
-      headerStyle: { backgroundColor: "#d8b4a0" },
-      headerTintColor: "#000",
-      headerTitleStyle: { fontWeight: "bold" },
-    }}
-  >
-    <Stack.Screen
-      name="AllEvents"
-      component={AllEvents}
-      options={{ headerShown: false }}
-    />
+  console.log("UserId in MainNavigator:", UserId);
+  console.log("Token in MainNavigator:", token);
 
-    <Stack.Screen
+  return (
+    <Stack.Navigator
+      initialRouteName="AllEvents"
+      screenOptions={{
+        headerStyle: { backgroundColor: "#d8b4a0" },
+        headerTintColor: "#000",
+        headerTitleStyle: { fontWeight: "bold" },
+      }}
+    >
+      <Stack.Screen
+        name="AllEvents"
+        component={AllEvents}
+        options={{ headerShown: false }}
+      />
+         <Stack.Screen
       name="Notification"
       component={Notification}
       options={{ headerShown: false }}
@@ -100,7 +106,6 @@ const MainNavigator = () => (
       component={MediaScreen}
       options={{ headerShown: false }}
     />
-
 
     <Stack.Screen
       name="CategoryImages"
@@ -179,9 +184,8 @@ const MainNavigator = () => (
       component={VendorDetails}
       options={{ headerShown: false }}
     />
-
-  </Stack.Navigator>
-
-);
+    </Stack.Navigator>
+  );
+};
 
 export default MainNavigator;

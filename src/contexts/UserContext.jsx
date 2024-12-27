@@ -1,42 +1,15 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import React, { createContext, useState, useContext } from 'react';
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [UserId, setUserId] = useState(null);
-  const [token, setToken] = useState(null);
-
-  const checkUserStatus = async () => {
-    const storedUserId = await AsyncStorage.getItem("UserId");
-    const storedToken = await AsyncStorage.getItem("token");
-
-    if (storedUserId && storedToken) {
-      setUserId(storedUserId);
-      setToken(storedToken);
-    }
-  };
-
-  const saveUserData = async (userId, token) => {
-    await AsyncStorage.setItem("UserId", userId);
-    await AsyncStorage.setItem("token", token);
-    setUserId(userId);
-    setToken(token);
-  };
-
-  const clearUserData = async () => {
-    await AsyncStorage.removeItem("UserId");
-    await AsyncStorage.removeItem("token");
-    setUserId(null);
-    setToken(null);
-  };
-
-  useEffect(() => {
-    checkUserStatus();
-  }, []);
+  const [user, setUser] = useState({
+    UserId: "1a699a3d-bd42-11ef-b8cc-064df626ed42",
+    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMWE2OTlhM2QtYmQ0Mi0xMWVmLWI4Y2MtMDY0ZGY2MjZlZDQyIiwibW9iaWxlX251bWJlciI6IjcwODA0MjU0OTEiLCJleHAiOjE3MzcyNjU4NjF9.UonnMWEPysXbAJR8HY01LfLIVCHnr82EI_0KboOlMXs"
+  });
 
   return (
-    <UserContext.Provider value={{ UserId, token, saveUserData, clearUserData }}>
+    <UserContext.Provider value={user}>
       {children}
     </UserContext.Provider>
   );
